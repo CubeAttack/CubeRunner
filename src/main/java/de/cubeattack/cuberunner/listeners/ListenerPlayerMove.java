@@ -40,7 +40,6 @@ public class ListenerPlayerMove implements Listener {
                         user.getCRPlayer().doneChallenge(CRStats.THE_KILLER_BUNNY);
                      }
                   }
-
                }
             }
          }

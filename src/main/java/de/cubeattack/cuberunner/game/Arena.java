@@ -1253,6 +1253,9 @@ public class Arena {
       DISCONNECT,
       HIDING,
       CRUSHED,
+
+      KILLED,
+
       COMMAND;
    }
 }
