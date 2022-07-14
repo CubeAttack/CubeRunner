@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CubeRunner">
+    <output-path>$USER_HOME$/Desktop/GamerStarTv/1.18/plugins</output-path>
+    <root id="archive" name="CubeRunner.jar">
+      <element id="module-output" name="CubeRunner" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+    </root>
+  </artifact>
+</component>
