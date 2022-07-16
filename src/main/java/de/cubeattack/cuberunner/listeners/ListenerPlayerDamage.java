@@ -22,42 +22,29 @@ public class ListenerPlayerDamage implements Listener {
       if (event.getEntity() instanceof Player) {
          Player player = (Player)event.getEntity();
          Arena arena = Arena.getArenaFromPlayer(player);
-         if (arena != null) {
-            if(event.getCause() == DamageCause.ENTITY_ATTACK){
-               event.setCancelled(false);
-            } else if (event.getCause() != DamageCause.FALLING_BLOCK) {
-               event.setCancelled(true);
-            }else if(arena.getGameState() != GameState.ACTIVE){
-               event.setCancelled(true);
-            } else {
-               User user = arena.getUser(player);
-               if (user.isEliminated()) {
-                  event.setCancelled(true);
-               } else {
-                  event.setDamage(0.0D);
-                  arena.eliminateUser(arena.getUser(player), Arena.LeavingReason.CRUSHED);
-                  String dammagerUUID = event.getDamager().getCustomName();
-                  if (!dammagerUUID.equalsIgnoreCase(player.getUniqueId().toString())) {
-                     CubeRunner.get().getCRPlayer(Bukkit.getPlayer(UUID.fromString(dammagerUUID))).increment(CRStats.KILLS, true);
-                  }
-               }
-            }
+         if (arena == null) {
+            event.setCancelled(true);
+            return;
          }
-      }
-   }
+         if (arena.getGameState() != GameState.ACTIVE) {
+            event.setCancelled(true);
+            return;
+         }
 
-   @EventHandler
-   public void onPlayerDamage(EntityDamageEvent event) {
-      if (event.getEntity() instanceof Player) {
-         Player player = (Player)event.getEntity();
-         Arena arena = Arena.getArenaFromPlayer(player);
-         if (arena != null) {
-            if (event.getCause() != DamageCause.FALLING_BLOCK) {
+         if(event.getCause() == DamageCause.ENTITY_ATTACK){
+            event.setCancelled(false);
+         } else if (event.getCause() != DamageCause.FALLING_BLOCK) {
+            event.setCancelled(true);
+         } else {
+            User user = arena.getUser(player);
+            if (user.isEliminated()) {
                event.setCancelled(true);
             } else {
-               User user = arena.getUser(player);
-               if (user.isEliminated()) {
-                  event.setCancelled(true);
+               event.setDamage(0.0D);
+               arena.eliminateUser(arena.getUser(player), Arena.LeavingReason.CRUSHED);
+               String dammagerUUID = event.getDamager().getCustomName();
+               if (!dammagerUUID.equalsIgnoreCase(player.getUniqueId().toString())) {
+                  CubeRunner.get().getCRPlayer(Bukkit.getPlayer(UUID.fromString(dammagerUUID))).increment(CRStats.KILLS, true);
                }
             }
          }

@@ -1,11 +1,16 @@
 package de.cubeattack.cuberunner;
 
+import org.bukkit.Bukkit;
+
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class MySQL {
    private CubeRunner plugin;
@@ -16,11 +21,6 @@ public class MySQL {
    private String user;
    private String password;
    private Connection connection;
-
-   public MySQL(CubeRunner plugin) {
-      this.plugin = plugin;
-      this.connection = null;
-   }
 
    public MySQL(CubeRunner plugin, String host, int port, String database, String user, String password, String prefix) {
       this.plugin = plugin;
@@ -40,7 +40,7 @@ public class MySQL {
    private void initializeDatabases() {
       this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "SIGNS (" + "uuid varchar(64), type varchar(32)," + "locationWorld varchar(32), locationX INT DEFAULT 0, locationY INT DEFAULT 0, locationZ INT DEFAULT 0);");
       this.update("ALTER TABLE " + this.prefix + "SIGNS CONVERT TO CHARACTER SET utf8;");
-      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "ARENAS (name varchar(32),world varchar(32)," + "minAmountPlayer INT DEFAULT 1, maxAmountPlayer INT DEFAULT 8, highestScore INT DEFAULT 0," + "colorIndice LONG, highestPlayer varchar(32) DEFAULT 'null'," + "minPointX INT DEFAULT 0,minPointY INT DEFAULT 0,minPointZ INT DEFAULT 0," + "maxPointX INT DEFAULT 0, maxPointY INT DEFAULT 0,maxPointZ INT DEFAULT 0," + "lobbyX DOUBLE DEFAULT 0,lobbyY DOUBLE DEFAULT 0,lobbyZ DOUBLE DEFAULT 0," + "lobbyPitch FLOAT DEFAULT 0,lobbyYaw FLOAT DEFAULT 0," + "startPointX DOUBLE DEFAULT 0,startPointY DOUBLE DEFAULT 0,startPointZ DOUBLE DEFAULT 0," + "startPointPitch FLOAT DEFAULT 0,startPointYaw FLOAT DEFAULT 0);");
+      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "ARENAS (name varchar(32),world varchar(32)," + "minAmountPlayer INT DEFAULT 1, maxAmountPlayer INT DEFAULT 8, highestScore INT DEFAULT 0," + "colorIndice LONG, highestPlayer varchar(32) DEFAULT 'null'," + "minPointX INT DEFAULT 0,minPointY INT DEFAULT 0,minPointZ INT DEFAULT 0," + "maxPointX INT DEFAULT 0, maxPointY INT DEFAULT 0,maxPointZ INT DEFAULT 0," + "lobbyX DOUBLE DEFAULT 0,lobbyY DOUBLE DEFAULT 0,lobbyZ DOUBLE DEFAULT 0," + "lobbyPitch FLOAT DEFAULT 0,lobbyYaw FLOAT DEFAULT 0," + "startPointX DOUBLE DEFAULT 0,startPointY DOUBLE DEFAULT 0,startPointZ DOUBLE DEFAULT 0," + "startPointPitch FLOAT DEFAULT 0,startPointYaw FLOAT DEFAULT 0," + "headLoc1 varchar(32) DEFAULT null,headName1 varchar(32) DEFAULT null," + "headLoc2 varchar(32) DEFAULT null,headName2 varchar(32) DEFAULT null," + "headLoc3 varchar(32) DEFAULT null,headName3 varchar(32) DEFAULT null);");
       this.update("ALTER TABLE " + this.prefix + "ARENAS CONVERT TO CHARACTER SET utf8;");
       this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "PLAYERS (UUID varchar(64), name varchar(64), language varchar(32), timePlayed INT DEFAULT 0," + "money DOUBLE DEFAULT 0, averageDistancePerGame DOUBLE DEFAULT 0, totalDistance DOUBLE DEFAULT 0," + "games INT DEFAULT 0, totalScore INT DEFAULT 0, kills INT DEFAULT 0, multiplayerWon INT DEFAULT 0," + "survive5Minutes BOOLEAN DEFAULT FALSE, reachHeight10 BOOLEAN DEFAULT FALSE," + "fillTheArena BOOLEAN DEFAULT FALSE, theAnswerToLife BOOLEAN DEFAULT FALSE," + "theRageQuit BOOLEAN DEFAULT FALSE, theKillerBunny BOOLEAN DEFAULT FALSE);");
       this.update("ALTER TABLE " + this.prefix + "PLAYERS CONVERT TO CHARACTER SET utf8;");
@@ -66,8 +66,19 @@ public class MySQL {
          this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?autoReconnect=true", this.user, this.password);
       } catch (SQLException var2) {
          this.plugin.getLogger().info("[MySQL] The connection to MySQL couldn't be made! reason: " + var2.getMessage());
+         Bukkit.getScheduler().scheduleSyncRepeatingTask(CubeRunner.get(), new Runnable() {
+            int count = 5;
+            @Override
+            public void run() {
+               if(count <= 0) {
+                  Bukkit.getServer().shutdown();
+                  return;
+               }
+               plugin.getLogger().severe("Server stopped due to missing mysql connect in " + count +  " seconds.");
+               count--;
+            }
+         }, 20, 20);
       }
-
    }
 
    public void close() {

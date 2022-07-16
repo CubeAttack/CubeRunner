@@ -18,7 +18,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public abstract class CRSign {
@@ -26,7 +25,6 @@ public abstract class CRSign {
    protected static Configuration config;
    private static MySQL mysql;
    protected static PlayerData playerData;
-   private static MinecraftConfiguration signData;
    protected static List<CRSign> signs = new ArrayList();
    private UUID uuid;
    protected Location location;
@@ -38,7 +36,6 @@ public abstract class CRSign {
       config = plugin.getConfiguration();
       mysql = plugin.getMySQL();
       playerData = plugin.getPlayerData();
-      signData = new MinecraftConfiguration((String)null, "signData", false);
    }
 
    public static void loadAllSigns() {
@@ -78,42 +75,6 @@ public abstract class CRSign {
          } catch (SQLException var7) {
             var7.printStackTrace();
          }
-      } else {
-         if (!signData.get().contains("signs")) {
-            return;
-         }
-
-         Iterator var9 = signData.get().getConfigurationSection("signs").getKeys(false).iterator();
-
-         while(var9.hasNext()) {
-            String uuid = (String)var9.next();
-            ConfigurationSection cs = signData.get().getConfigurationSection("signs." + uuid);
-            Location location = new Location(Bukkit.getWorld(cs.getString("location.world")), (double)cs.getInt("location.X", 0), (double)cs.getInt("location.Y", 0), (double)cs.getInt("location.Z"));
-
-            try {
-               switch($SWITCH_TABLE$me$poutineqc$cuberunner$commands$signs$CRSign$SignType()[CRSign.SignType.valueOf(cs.getString("type", UUID.randomUUID().toString())).ordinal()]) {
-               case 1:
-                  new CRSignJoin(UUID.fromString(uuid), location);
-                  break;
-               case 2:
-                  new CRSignPlay(UUID.fromString(uuid), location);
-                  break;
-               case 3:
-                  new CRSignStart(UUID.fromString(uuid), location);
-                  break;
-               case 4:
-                  new CRSignQuit(UUID.fromString(uuid), location);
-                  break;
-               case 5:
-                  new CRSignStats(UUID.fromString(uuid), location);
-                  break;
-               case 6:
-                  new CRSignTop(UUID.fromString(uuid), location);
-               }
-            } catch (IllegalArgumentException var5) {
-               removeSign(UUID.fromString(uuid), location);
-            }
-         }
       }
 
       updateSigns();
@@ -129,15 +90,7 @@ public abstract class CRSign {
       this.location = location;
       if (mysql.hasConnection()) {
          mysql.update("INSERT INTO " + config.tablePrefix + "SIGNS (uuid, type ,locationWorld, locationX, locationY, locationZ) " + "VALUES ('" + this.uuid + "','" + type.name() + "','" + location.getWorld().getName() + "','" + location.getBlockX() + "','" + location.getBlockY() + "','" + location.getBlockZ() + "');");
-      } else {
-         signData.get().set("signs." + this.uuid.toString() + ".type", type.name());
-         signData.get().set("signs." + this.uuid.toString() + ".location.world", location.getWorld().getName());
-         signData.get().set("signs." + this.uuid.toString() + ".location.X", location.getBlockX());
-         signData.get().set("signs." + this.uuid.toString() + ".location.Y", location.getBlockY());
-         signData.get().set("signs." + this.uuid.toString() + ".location.Z", location.getBlockZ());
-         signData.save();
       }
-
    }
 
    private static void removeSign(UUID uuid, Location location) {
@@ -153,9 +106,6 @@ public abstract class CRSign {
 
       if (mysql.hasConnection()) {
          mysql.update("DELETE FROM " + config.tablePrefix + "SIGNS WHERE uuid='" + uuid.toString() + "';");
-      } else {
-         signData.get().set("signs." + uuid.toString(), (Object)null);
-         signData.save();
       }
 
    }

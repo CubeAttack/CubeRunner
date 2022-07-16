@@ -21,23 +21,6 @@ public class CRPlayer {
       int var5;
       if (CubeRunner.get().getMySQL().hasConnection()) {
          CubeRunner.get().getMySQL().newPlayer(uuid, name);
-      } else {
-         MinecraftConfiguration config = CubeRunner.get().getPlayerConfig();
-         CRStats[] var7;
-         int var6 = (var7 = CRStats.values()).length;
-
-         for(var5 = 0; var5 < var6; ++var5) {
-            CRStats key = var7[var5];
-            if (key == CRStats.NAME) {
-               config.get().set("players." + uuid.toString() + "." + key.getNameFlatFile(), name);
-            } else {
-               config.get().set("players." + uuid.toString() + "." + key.getNameFlatFile(), key.getDefaultValue());
-            }
-
-            config.save();
-         }
-
-         CubeRunner.get().updateAll(this);
       }
 
       CRStats[] var10;
@@ -51,19 +34,6 @@ public class CRPlayer {
          }
       }
 
-   }
-
-   public CRPlayer(String uuid, ConfigurationSection config) {
-      this.uuid = UUID.fromString(uuid);
-      CRStats[] var6;
-      int var5 = (var6 = CRStats.values()).length;
-
-      for(int var4 = 0; var4 < var5; ++var4) {
-         CRStats stats = var6[var4];
-         this.stats.put(stats, stats.getValue(config));
-      }
-
-      CubeRunner.get().updateAll(this);
    }
 
    public CRPlayer(ResultSet query) {
@@ -86,19 +56,12 @@ public class CRPlayer {
    private void updateInformation(CRStats key, String value) {
       if (CubeRunner.get().getMySQL().hasConnection()) {
          CubeRunner.get().getMySQL().updatePlayer(this.uuid, key, value);
-      } else {
-         CubeRunner.get().getPlayerConfig().get().set("players." + this.uuid.toString() + "." + key.getNameFlatFile(), value);
-         CubeRunner.get().getPlayerConfig().save();
       }
-
    }
 
    private void updateInformation(CRStats key, double value) {
       if (CubeRunner.get().getMySQL().hasConnection()) {
          CubeRunner.get().getMySQL().updatePlayer(this.uuid, key, String.valueOf(value));
-      } else {
-         CubeRunner.get().getPlayerConfig().get().set("players." + this.uuid.toString() + "." + key.getNameFlatFile(), value);
-         CubeRunner.get().getPlayerConfig().save();
       }
 
    }
@@ -106,9 +69,6 @@ public class CRPlayer {
    private void updateInformation(CRStats key, int value) {
       if (CubeRunner.get().getMySQL().hasConnection()) {
          CubeRunner.get().getMySQL().updatePlayer(this.uuid, key, String.valueOf(value));
-      } else {
-         CubeRunner.get().getPlayerConfig().get().set("players." + this.uuid.toString() + "." + key.getNameFlatFile(), value);
-         CubeRunner.get().getPlayerConfig().save();
       }
 
    }
@@ -116,9 +76,6 @@ public class CRPlayer {
    private void updateInformation(CRStats key, boolean value) {
       if (CubeRunner.get().getMySQL().hasConnection()) {
          CubeRunner.get().getMySQL().updatePlayer(this.uuid, key, value ? "1" : "0");
-      } else {
-         CubeRunner.get().getPlayerConfig().get().set("players." + this.uuid.toString() + "." + key.getNameFlatFile(), value);
-         CubeRunner.get().getPlayerConfig().save();
       }
 
    }

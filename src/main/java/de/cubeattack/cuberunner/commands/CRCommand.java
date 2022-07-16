@@ -461,6 +461,7 @@ public enum CRCommand {
 
       }
    },
+
    SETCOLOR("setcolor", Language.Messages.COMMAND_SETCOLOR, "cuberunner.admin.edit.color", "/%command% setcolor <arenaName>", CRCommand.CRCommandType.ARENA) {
       public void execute(CubeRunner plugin, Player player, String[] args, Object... extra) {
          Language local = CubeRunner.get().getLang(player);
@@ -496,6 +497,40 @@ public enum CRCommand {
       }
 
       public void complete(List<String> tabCompletion, String[] args) {
+      }
+   },
+   SETHEADS("setheads", Language.Messages.COMMAND_SETHEADS, "cuberunner.admin.edit.setplayerheads", "/%command% setheads <arenaName> <count>", CRCommand.CRCommandType.ARENA) {
+      public void execute(CubeRunner plugin, Player player, String[] args, Object... extra) {
+         Language local = CubeRunner.get().getLang(player);
+         Arena arena = args.length > 1 ? Arena.getArena(args[1]) : null;
+         if (arena == null) {
+            local.sendMsg(player, local.get(Language.Messages.ERROR_MISSING_ARENA));
+         } else {
+            if (args.length < 3) {
+               local.sendMsg(player, local.get(Language.Messages.EDIT_PLAYERS_MISSING));
+            }
+
+            try {
+               int count =  Integer.parseInt(args[2]);
+               arena.setPlayerHeads(count, player);
+            } catch (NumberFormatException var8) {
+               local.sendMsg(player, local.get(Language.Messages.EDIT_PLAYERS_HEADS_ERROR));
+            }
+         }
+      }
+
+      public void complete(List<String> tabCompletion, String[] args) {
+         if (args.length == 2) {
+            Iterator var4 = Arena.getArenas().iterator();
+
+            while(var4.hasNext()) {
+               Arena arena = (Arena)var4.next();
+               if (arena.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                  tabCompletion.add(arena.getName());
+               }
+            }
+         }
+
       }
    };
 

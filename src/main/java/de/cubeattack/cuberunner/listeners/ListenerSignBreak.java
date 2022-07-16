@@ -19,7 +19,6 @@ public class ListenerSignBreak implements Listener {
             if (dacSign != null) {
                dacSign.removeSign();
             }
-
          }
       }
    }

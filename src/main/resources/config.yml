@@ -25,16 +25,15 @@
 # Simply put it in the LanguageFiles folder and write it's name here (without the ".yml")
 # This will option will be the "CR server language".. The signs will be in this language.
 # Warning: If you change this, a simple /dac reload won't do, you'll have to restart the server.
-language: 'de1'
+language: 'de'
 
 # Set to true if you have a MySQL database and fill the information below
 # Warning: If you change this, a simple /dac reload won't do, you'll have to restart the server.
-mysql: false
 host: 127.0.0.1
 port: 3306
-user: ''
-password: ''
-database: 'cuberunner'
+user: 'root'
+password: 'password'
+database: 'CubeRunner'
 tablePrefix: 'cuberunner_'
 
 # If you want the Plugin's "logo" ([cr] if not changed) to be displayed in front of every messages

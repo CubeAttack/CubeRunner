@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import de.cubeattack.cuberunner.game.Arena;
 import de.cubeattack.cuberunner.commands.signs.CRSign;
+import de.cubeattack.cuberunner.game.Head;
 import de.cubeattack.cuberunner.listeners.*;
 import de.cubeattack.cuberunner.utils.MinecraftConfiguration;
 import net.milkbowl.vault.economy.Economy;
@@ -20,39 +21,43 @@ public class CubeRunner extends JavaPlugin {
    public static final String name = "CubeRunner";
    private Configuration config;
    private MySQL mysql = new MySQL();
-   private ArenaData arenaData;
    private PlayerData playerData;
    private AchievementManager achievementManager;
    private Economy economy;
-   public static String NMS_VERSION;
 
-   public void onEnable() {
-
+   public void onLoad(){
       plugin = this;
-      NMS_VERSION = this.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
       this.config = new Configuration(this);
 
-      if (this.initialiseEconomy()) {
-         this.loadLanguages();
-         this.connectMySQL();
-         this.arenaData = new ArenaData(this);
-         this.playerData = new PlayerData(this);
-         this.playerData.loadPlayers(plugin);
-         this.achievementManager = new AchievementManager(this);
-         CRSign.setVariables(this);
-         new Arena(this);
-         this.getCommand("cuberunner").setExecutor(new ListenerCommand());
-         this.getCommand("cuberunner").setTabCompleter(new ListenerTabComplete());
-         this.enableListeners();
+   }
 
-         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            public void run() {
-               Arena.loadExistingArenas();
-               CRSign.loadAllSigns();
-            }
-         }, 0L);
-         this.getLogger().info(this.getDescription().getName() + " has been enabled (v" + this.getDescription().getVersion() + ")");
+   public void onEnable() {
+      this.connectMySQL();
+      this.loadLanguages();
+
+      if (!this.initialiseEconomy()) {
+         this.getServer().getPluginManager().disablePlugin(this);
       }
+
+      this.playerData = new PlayerData(this);
+      this.playerData.loadPlayers(plugin);
+      this.achievementManager = new AchievementManager(this);
+      CRSign.setVariables(this);
+      Head.setVariables(this);
+      new Arena(this);
+      this.getCommand("cuberunner").setExecutor(new ListenerCommand());
+      this.getCommand("cuberunner").setTabCompleter(new ListenerTabComplete());
+      this.enableListeners();
+
+      Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+         public void run() {
+            Arena.loadExistingArenas();
+            CRSign.loadAllSigns();
+            Head.loadHeads();
+            Head.updateHeads();
+         }
+      }, 0L);
+      this.getLogger().info(this.getDescription().getName() + " has been enabled (v" + this.getDescription().getVersion() + ")");
    }
 
    public void onDisable() {
@@ -61,8 +66,6 @@ public class CubeRunner extends JavaPlugin {
 
       if (this.mysql.hasConnection()) {
          this.mysql.close();
-      } else {
-         this.arenaData.loadArenaData();
       }
 
       logger.info(pdfFile.getName() + " has been diabled");
@@ -85,12 +88,7 @@ public class CubeRunner extends JavaPlugin {
    }
 
    public void connectMySQL() {
-      if (this.config.mysql) {
-         this.mysql = new MySQL(this, this.config.host, this.config.port, this.config.database, this.config.user, this.config.password, this.config.tablePrefix);
-      } else {
-         this.mysql = new MySQL(this);
-      }
-
+      this.mysql = new MySQL(this, this.config.host, this.config.port, this.config.database, this.config.user, this.config.password, this.config.tablePrefix);
    }
 
    public void loadLanguages() {
@@ -159,10 +157,6 @@ public class CubeRunner extends JavaPlugin {
 
    public MySQL getMySQL() {
       return this.mysql;
-   }
-
-   public ArenaData getArenaData() {
-      return this.arenaData;
    }
 
    public PlayerData getPlayerData() {

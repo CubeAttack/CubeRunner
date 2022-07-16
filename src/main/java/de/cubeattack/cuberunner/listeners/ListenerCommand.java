@@ -68,6 +68,11 @@ public class ListenerCommand implements CommandExecutor {
          int[] var0 = new int[CRCommand.values().length];
 
          try {
+            var0[CRCommand.SETHEADS.ordinal()] = 18;
+         } catch (NoSuchFieldError var18) {
+         }
+
+         try {
             var0[CRCommand.DELETE.ordinal()] = 10;
          } catch (NoSuchFieldError var17) {
          }

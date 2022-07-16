@@ -3,7 +3,6 @@ package de.cubeattack.cuberunner.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.cubeattack.cuberunner.ArenaData;
 import de.cubeattack.cuberunner.CubeRunner;
 import de.cubeattack.cuberunner.MySQL;
 import de.cubeattack.cuberunner.utils.ItemStackManager;
@@ -16,12 +15,10 @@ public class ColorManager {
    private List<ItemStackManager> onlyChoosenBlocks;
    private MySQL mysql;
    private Arena arena;
-   private ArenaData arenaData;
 
    public ColorManager(Long colorIndice, CubeRunner plugin, Arena arena) {
       this.colorIndice = colorIndice;
       this.mysql = plugin.getMySQL();
-      this.arenaData = plugin.getArenaData();
       this.arena = arena;
       this.updateLists();
    }
@@ -31,11 +28,7 @@ public class ColorManager {
       this.updateLists();
       if (this.mysql.hasConnection()) {
          this.mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET colorIndice=" + colorIndice + " WHERE name='" + this.arena.getName() + "';");
-      } else {
-         this.arenaData.getData().set("arenas." + this.arena.getName() + ".colorIndice", colorIndice);
-         this.arenaData.saveArenaData();
       }
-
    }
 
    public void updateLists() {

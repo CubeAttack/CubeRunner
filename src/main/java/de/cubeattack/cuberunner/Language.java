@@ -1,6 +1,5 @@
 package de.cubeattack.cuberunner;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -180,6 +179,7 @@ public class Language {
       EDIT_LOBBY("editLobby", "&aLobby successfully set for the arena &2%arena%&a."),
       EDIT_PLAYERS_MISSING("editPlayersMissing", "&cYou must provide a quantity to change the amount of players."),
       EDIT_PLAYERS_ERROR("editPlayersError", "&cThe amount of player you entered is not valid. &7[&8%error%&7]"),
+      EDIT_PLAYERS_HEADS_ERROR("editPlayersHeadsError", "Please enter a valid number between 1-3"),
       EDIT_PLAYERS_NAN("editPlayersNaN", "Not a number"),
       EDIT_PLAYERS_MINIMUM_1("editPlayersMinimum1", "Minimum lower than 1"),
       EDIT_PLAYERS_MINIMUM_MAXIMUM("editPlayersMinimumMaximum", "Minimum higher than maximum"),
@@ -261,6 +261,7 @@ public class Language {
       COMMAND_SETSTARTPOINT("cmdDescriptionStartpoint", "&7Set the start point of the selected arena."),
       COMMAND_SETMINPLAYER("cmdDescriptionSetminplayer", "&7Set the minimum amount of player for an arena."),
       COMMAND_SETMAXPLAYER("cmdDescriptionSetmaxplayer", "&7Set the maximum amount of player for an arena."),
+      COMMAND_SETHEADS("cmdDescriptionSetplayerheads", "&7Set player heads for an arena."),
       COMMAND_SETCOLOR("cmdDescriptionSetcolor", "&7Set the block colors for the arena"),
       COMMAND_RELOAD("cmdDescriptionReload", "&7Reload the config, the player data and the language files.");
 

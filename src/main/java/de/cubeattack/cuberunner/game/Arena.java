@@ -1,7 +1,5 @@
 package de.cubeattack.cuberunner.game;
 
-import com.google.gson.JsonObject;
-import com.mysql.cj.Session;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import java.sql.ResultSet;
@@ -9,14 +7,13 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionManager;
-import com.sk89q.worldedit.session.SessionOwner;
-import de.cubeattack.cuberunner.ArenaData;
 import de.cubeattack.cuberunner.Language;
 import de.cubeattack.cuberunner.CRPlayer;
 import de.cubeattack.cuberunner.CRStats;
@@ -25,8 +22,6 @@ import de.cubeattack.cuberunner.MySQL;
 import de.cubeattack.cuberunner.commands.signs.CRSign;
 import de.cubeattack.cuberunner.utils.ItemStackManager;
 import de.cubeattack.cuberunner.utils.Permissions;
-import de.cubeattack.cuberunner.utils.Utils;
-import net.milkbowl.vault.chat.Chat;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -38,7 +33,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -49,7 +43,6 @@ import org.bukkit.util.Vector;
 public class Arena {
    private static CubeRunner plugin;
    private static MySQL mysql;
-   private static ArenaData arenaData;
    private static List<Arena> arenas = new ArrayList();
    private String name;
    private World world;
@@ -71,12 +64,13 @@ public class Arena {
    // $FF: synthetic field
    private static int[] $SWITCH_TABLE$me$poutineqc$cuberunner$game$GameState;
 
+   private static HashMap<Integer, Location> heads = new HashMap();
+
    public Arena(CubeRunner plugin) {
       this.gameState = GameState.UNREADY;
       this.multiplayerGame = false;
       Arena.plugin = plugin;
       mysql = plugin.getMySQL();
-      arenaData = plugin.getArenaData();
    }
 
    public static void loadExistingArenas() {
@@ -115,33 +109,7 @@ public class Arena {
          } catch (SQLException var12) {
             plugin.getLogger().info("[MySQL] Error while loading arenas.");
          }
-      } else {
-         if (!arenaData.getData().contains("arenas")) {
-            return;
-         }
-
-         Iterator var14 = arenaData.getData().getConfigurationSection("arenas").getKeys(false).iterator();
-
-         while(var14.hasNext()) {
-            String arenaName = (String)var14.next();
-            World world = Bukkit.getServer().getWorld(arenaData.getData().getString("arenas." + arenaName + ".world"));
-            Long colorIndice = arenaData.getData().getLong("arenas." + arenaName + ".colorIndice", 1L);
-            minPoint = new Location(world, (double)arenaData.getData().getInt("arenas." + arenaName + ".minPoint.X", 0), (double)arenaData.getData().getInt("arenas." + arenaName + ".minPoint.Y", 0), (double)arenaData.getData().getInt("arenas." + arenaName + ".minPoint.Z", 0));
-            maxPoint = new Location(world, (double)arenaData.getData().getInt("arenas." + arenaName + ".maxPoint.X", 0), (double)arenaData.getData().getInt("arenas." + arenaName + ".maxPoint.Y", 0), (double)arenaData.getData().getInt("arenas." + arenaName + ".maxPoint.Z", 0));
-            lobby = new Location(world, arenaData.getData().getDouble("arenas." + arenaName + ".lobby.X", 0.0D), arenaData.getData().getDouble("arenas." + arenaName + ".lobby.Y", 0.0D), arenaData.getData().getDouble("arenas." + arenaName + ".lobby.Z", 0.0D));
-            lobby.setPitch((float)arenaData.getData().getDouble("arenas." + arenaName + ".lobby.Pitch", 0.0D));
-            lobby.setYaw((float)arenaData.getData().getDouble("arenas." + arenaName + ".lobby.Yaw", 0.0D));
-            startPoint = new Location(world, arenaData.getData().getDouble("arenas." + arenaName + ".startPoint.X", 0.0D), arenaData.getData().getDouble("arenas." + arenaName + ".startPoint.Y", 0.0D), arenaData.getData().getDouble("arenas." + arenaName + ".startPoint.Z", 0.0D));
-            startPoint.setPitch((float)arenaData.getData().getDouble("arenas." + arenaName + ".startPoint.Pitch", 0.0D));
-            startPoint.setYaw((float)arenaData.getData().getDouble("arenas." + arenaName + ".startPoint.Yaw", 0.0D));
-            minAmountPlayer = arenaData.getData().getInt("arenas." + arenaName + ".minAmountPlayer", 1);
-            maxAmountPlayer = arenaData.getData().getInt("arenas." + arenaName + ".maxAmountPlayer", 8);
-            highestScore = arenaData.getData().getInt("arenas." + arenaName + ".highestScore.score", 0);
-            highestPlayer = arenaData.getData().getString("arenas." + arenaName + ".highestScore.player", "null");
-            new Arena(arenaName, world, minPoint, maxPoint, lobby, startPoint, minAmountPlayer, maxAmountPlayer, highestScore, highestPlayer, colorIndice);
-         }
       }
-
    }
 
    private Arena(String name, World world, Location minPoint, Location maxPoint, Location lobby, Location startPoint, int minAmountPlayer, int maxAmountPlayer, int highestScore, String highestPlayer, Long colorIndice) {
@@ -190,10 +158,6 @@ public class Arena {
       if (mysql.hasConnection()) {
          mysql.update("INSERT INTO " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS (name, world) " + "VALUES ('" + name + "','" + this.world.getName() + "');");
          mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET colorIndice=" + 1L + " WHERE name='" + name + "';");
-      } else {
-         arenaData.getData().set("arenas." + name + ".world", this.world.getName());
-         arenaData.getData().set("arenas." + name + ".colorIndice", 1L);
-         arenaData.saveArenaData();
       }
 
    }
@@ -227,9 +191,6 @@ public class Arena {
       arenas.remove(this);
       if (mysql.hasConnection()) {
          mysql.update("DELETE FROM " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS WHERE name='" + this.name + "';");
-      } else {
-         arenaData.getData().set("arenas." + this.name, (Object)null);
-         arenaData.saveArenaData();
       }
 
    }
@@ -254,15 +215,6 @@ public class Arena {
       local.sendMsg(player, local.get(Language.Messages.EDIT_REGION).replace("%arena%", this.name));
       if (mysql.hasConnection()) {
          mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET world='" + this.world.getName() + "',minPointX=" + this.minPoint.getBlockX() + ",minPointY=" + this.minPoint.getBlockY() + ",minPointZ=" + this.minPoint.getBlockZ() + ",maxPointX=" + this.maxPoint.getBlockX() + ",maxPointY=" + this.maxPoint.getBlockY() + ",maxPointZ=" + this.maxPoint.getBlockZ() + " WHERE name='" + this.name + "';");
-      } else {
-         arenaData.getData().set("arenas." + this.name + ".world", this.world.getName());
-         arenaData.getData().set("arenas." + this.name + ".minPoint.X", this.minPoint.getBlockX());
-         arenaData.getData().set("arenas." + this.name + ".minPoint.Y", this.minPoint.getBlockY());
-         arenaData.getData().set("arenas." + this.name + ".minPoint.Z", this.minPoint.getBlockZ());
-         arenaData.getData().set("arenas." + this.name + ".maxPoint.X", this.maxPoint.getBlockX());
-         arenaData.getData().set("arenas." + this.name + ".maxPoint.Y", this.maxPoint.getBlockY());
-         arenaData.getData().set("arenas." + this.name + ".maxPoint.Z", this.maxPoint.getBlockZ());
-         arenaData.saveArenaData();
       }
 
       if (this.isReady()) {
@@ -279,14 +231,6 @@ public class Arena {
       local.sendMsg(player, local.get(Language.Messages.EDIT_LOBBY).replace("%arena%", this.name));
       if (mysql.hasConnection()) {
          mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET world='" + this.world.getName() + "',lobbyX=" + this.lobby.getX() + ",lobbyY=" + this.lobby.getY() + ",lobbyZ=" + this.lobby.getZ() + ",lobbyPitch=" + this.lobby.getPitch() + ",lobbyYaw=" + this.lobby.getYaw() + " WHERE name='" + this.name + "';");
-      } else {
-         arenaData.getData().set("arenas." + this.name + ".world", this.world.getName());
-         arenaData.getData().set("arenas." + this.name + ".lobby.X", this.lobby.getX());
-         arenaData.getData().set("arenas." + this.name + ".lobby.Y", this.lobby.getY());
-         arenaData.getData().set("arenas." + this.name + ".lobby.Z", this.lobby.getZ());
-         arenaData.getData().set("arenas." + this.name + ".lobby.Pitch", this.lobby.getPitch());
-         arenaData.getData().set("arenas." + this.name + ".lobby.Yaw", this.lobby.getYaw());
-         arenaData.saveArenaData();
       }
 
       if (this.isReady()) {
@@ -304,14 +248,6 @@ public class Arena {
       local.sendMsg(player, local.get(Language.Messages.EDIT_STARTPOINT).replace("%arena%", this.name));
       if (mysql.hasConnection()) {
          mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET world='" + this.world.getName() + "',startPointX=" + this.startPoint.getX() + ",startPointY=" + this.startPoint.getY() + ",startPointZ=" + this.startPoint.getZ() + ",startPointPitch=" + this.startPoint.getPitch() + ",startPointYaw=" + this.startPoint.getYaw() + " WHERE name='" + this.name + "';");
-      } else {
-         arenaData.getData().set("arenas." + this.name + ".world", this.world.getName());
-         arenaData.getData().set("arenas." + this.name + ".startPoint.X", this.startPoint.getX());
-         arenaData.getData().set("arenas." + this.name + ".startPoint.Y", this.startPoint.getY());
-         arenaData.getData().set("arenas." + this.name + ".startPoint.Z", this.startPoint.getZ());
-         arenaData.getData().set("arenas." + this.name + ".startPoint.Pitch", this.startPoint.getPitch());
-         arenaData.getData().set("arenas." + this.name + ".startPoint.Yaw", this.startPoint.getYaw());
-         arenaData.saveArenaData();
       }
 
       if (this.isReady()) {
@@ -330,9 +266,6 @@ public class Arena {
       } else {
          if (mysql.hasConnection()) {
             mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET minAmountPlayer=" + amount + " WHERE name='" + this.name + "';");
-         } else {
-            arenaData.getData().set("arenas." + this.name + ".minAmountPlayer", amount);
-            arenaData.saveArenaData();
          }
 
          this.scoreboard.resetScores(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_MINIMUM) + " = " + ChatColor.LIGHT_PURPLE + this.minAmountPlayer);
@@ -351,15 +284,34 @@ public class Arena {
       } else {
          if (mysql.hasConnection()) {
             mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET maxAmountPlayer=" + amount + " WHERE name='" + this.name + "';");
-         } else {
-            arenaData.getData().set("arenas." + this.name + ".maxAmountPlayer", amount);
-            arenaData.saveArenaData();
          }
 
          this.scoreboard.resetScores(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_MAXIMUM) + " = " + ChatColor.LIGHT_PURPLE + this.maxAmountPlayer);
          this.maxAmountPlayer = amount;
          this.objective.getScore(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_MAXIMUM) + " = " + ChatColor.LIGHT_PURPLE + this.maxAmountPlayer).setScore(3);
          local.sendMsg(player, local.get(Language.Messages.COMMAND_SETMAXPLAYER).replace("%arena%", this.name));
+      }
+   }
+
+   public void setPlayerHeads(int count, Player player) {
+      Language local = CubeRunner.get().getCRPlayer(player).getLanguage();
+      Block block = player.getTargetBlock(null, 10);
+      if(block.getType() != Material.PLAYER_WALL_HEAD){
+         local.sendMsg(player, local.get(Language.Messages.EDIT_PLAYERS_HEADS_ERROR));
+         return;
+      }
+
+      double x = block.getX();
+      double y = block.getY();
+      double z = block.getZ();
+      String locAsString = x + ", " + y + ", " + + z;
+      if (count > 3 || count < 1) {
+         local.sendMsg(player, local.get(Language.Messages.EDIT_PLAYERS_ERROR).replace("%error%", local.get(Language.Messages.EDIT_PLAYERS_MAXIMUM_10)));
+      } else {
+         if (mysql.hasConnection()) {
+            mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET headLoc" + count  + "='" + locAsString + "' WHERE name='" + this.name + "';");
+         }
+         local.sendMsg(player, local.get(Language.Messages.COMMAND_SETHEADS));
       }
    }
 
@@ -989,6 +941,8 @@ public class Arena {
    private void endingSequence() {
       this.gameState = GameState.ENDING;
       CRSign.updateSigns(this);
+      Head.updateHeads(this);
+      this.resetArena();
       User user = this.getHighestScore();
       if (this.multiplayerGame) {
          try {
@@ -1013,10 +967,6 @@ public class Arena {
 
          if (mysql.hasConnection()) {
             mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET highestScore='" + user.getScore() + "', highestPlayer='" + user.getPlayer().getName() + "' WHERE name='" + this.name + "';");
-         } else {
-            arenaData.getData().set("arenas." + this.name + ".highestScore.score", this.highestScore);
-            arenaData.getData().set("arenas." + this.name + ".highestScore.player", user.getPlayer().getName());
-            arenaData.saveArenaData();
          }
       }
 
@@ -1029,7 +979,6 @@ public class Arena {
             local = u.getCRPlayer().getLanguage();
             local.sendMsg(u, local.get(Language.Messages.END_TELEPORT));
          }
-
          Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             public void run() {
                Arena.this.kickUsers(false);
@@ -1058,12 +1007,11 @@ public class Arena {
    private void kickUsers(boolean wait) {
       Iterator var3 = this.users.iterator();
 
-      while(var3.hasNext()) {
-         User user = (User)var3.next();
+      while (var3.hasNext()) {
+         User user = (User) var3.next();
          user.allowTeleport();
          user.ireturnStats();
       }
-
       this.users.clear();
       Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
          public void run() {
@@ -1257,5 +1205,9 @@ public class Arena {
       KILLED,
 
       COMMAND;
+   }
+
+   public HashMap<Integer, Location> getHeadsList(){
+      return heads;
    }
 }

@@ -63,17 +63,6 @@ public final class PlayerData implements Listener {
          } catch (SQLException var5) {
             var5.printStackTrace();
          }
-      } else {
-         this.playerData = new MinecraftConfiguration((String)null, "playerData", false);
-         if (this.playerData.get().contains("players")) {
-            Iterator var7 = this.playerData.get().getConfigurationSection("players").getKeys(false).iterator();
-
-            while(var7.hasNext()) {
-               String uuid = (String)var7.next();
-               CRPlayer player = new CRPlayer(uuid, this.playerData.get().getConfigurationSection("players." + uuid));
-               this.players.put(player.getUUID(), player);
-            }
-         }
       }
 
    }
