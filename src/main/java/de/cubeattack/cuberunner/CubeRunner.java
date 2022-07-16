@@ -1,29 +1,14 @@
 package de.cubeattack.cuberunner;
 
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonObject;
 import de.cubeattack.cuberunner.game.Arena;
 import de.cubeattack.cuberunner.commands.signs.CRSign;
-import de.cubeattack.cuberunner.listeners.ListenerCommand;
-import de.cubeattack.cuberunner.listeners.ListenerEntityChangeBlock;
-import de.cubeattack.cuberunner.listeners.ListenerEntityGlide;
-import de.cubeattack.cuberunner.listeners.ListenerInventoryClick;
-import de.cubeattack.cuberunner.listeners.ListenerInventoryClose;
-import de.cubeattack.cuberunner.listeners.ListenerPlayerDamage;
-import de.cubeattack.cuberunner.listeners.ListenerPlayerDisconnect;
-import de.cubeattack.cuberunner.listeners.ListenerPlayerInteract;
-import de.cubeattack.cuberunner.listeners.ListenerPlayerMove;
-import de.cubeattack.cuberunner.listeners.ListenerPlayerTeleport;
-import de.cubeattack.cuberunner.listeners.ListenerSignBreak;
-import de.cubeattack.cuberunner.listeners.ListenerSignUpdate;
-import de.cubeattack.cuberunner.listeners.ListenerTabComplete;
+import de.cubeattack.cuberunner.listeners.*;
 import de.cubeattack.cuberunner.utils.MinecraftConfiguration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -42,8 +27,6 @@ public class CubeRunner extends JavaPlugin {
    public static String NMS_VERSION;
 
    public void onEnable() {
-
-      System.out.println(CraftBlock.class.getMethods());
 
       plugin = this;
       NMS_VERSION = this.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
@@ -157,6 +140,7 @@ public class CubeRunner extends JavaPlugin {
       pm.registerEvents(new ListenerPlayerDamage(), this);
       pm.registerEvents(new ListenerPlayerTeleport(), this);
       pm.registerEvents(new ListenerPlayerDisconnect(), this);
+      pm.registerEvents(new ListenerPlayerDeath(), this);
       pm.registerEvents(new ListenerSignUpdate(), this);
       pm.registerEvents(new ListenerPlayerInteract(), this);
       pm.registerEvents(new ListenerInventoryClose(), this);

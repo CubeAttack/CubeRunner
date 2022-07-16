@@ -23,9 +23,11 @@ public class ListenerPlayerDamage implements Listener {
          Player player = (Player)event.getEntity();
          Arena arena = Arena.getArenaFromPlayer(player);
          if (arena != null) {
-            if (event.getCause() != DamageCause.FALLING_BLOCK) {
+            if(event.getCause() == DamageCause.ENTITY_ATTACK){
+               event.setCancelled(false);
+            } else if (event.getCause() != DamageCause.FALLING_BLOCK) {
                event.setCancelled(true);
-            } else if (arena.getGameState() != GameState.ACTIVE) {
+            }else if(arena.getGameState() != GameState.ACTIVE){
                event.setCancelled(true);
             } else {
                User user = arena.getUser(player);
