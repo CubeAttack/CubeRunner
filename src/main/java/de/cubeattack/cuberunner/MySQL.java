@@ -2,15 +2,12 @@ package de.cubeattack.cuberunner;
 
 import org.bukkit.Bukkit;
 
-import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class MySQL {
    private CubeRunner plugin;

@@ -1,5 +1,6 @@
 package de.cubeattack.cuberunner;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -7,7 +8,6 @@ import de.cubeattack.cuberunner.game.Arena;
 import de.cubeattack.cuberunner.commands.signs.CRSign;
 import de.cubeattack.cuberunner.game.Head;
 import de.cubeattack.cuberunner.listeners.*;
-import de.cubeattack.cuberunner.utils.MinecraftConfiguration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -45,17 +45,15 @@ public class CubeRunner extends JavaPlugin {
       CRSign.setVariables(this);
       Head.setVariables(this);
       new Arena(this);
-      this.getCommand("cuberunner").setExecutor(new ListenerCommand());
-      this.getCommand("cuberunner").setTabCompleter(new ListenerTabComplete());
+      Objects.requireNonNull(this.getCommand("cuberunner")).setExecutor(new ListenerCommand());
+      Objects.requireNonNull(this.getCommand("cuberunner")).setTabCompleter(new ListenerTabComplete());
       this.enableListeners();
 
-      Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-         public void run() {
-            Arena.loadExistingArenas();
-            CRSign.loadAllSigns();
-            Head.loadHeads();
-            Head.updateHeads();
-         }
+      Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+         Arena.loadExistingArenas();
+         CRSign.loadAllSigns();
+         Head.loadHeads();
+         Head.updateHeads();
       }, 0L);
       this.getLogger().info(this.getDescription().getName() + " has been enabled (v" + this.getDescription().getVersion() + ")");
    }
@@ -119,7 +117,7 @@ public class CubeRunner extends JavaPlugin {
             return false;
          } else {
             this.economy = rsp.getProvider();
-            return this.economy != null;
+            return true;
          }
       }
    }
@@ -169,10 +167,6 @@ public class CubeRunner extends JavaPlugin {
 
    public CRPlayer getCRPlayer(Player player) {
       return this.playerData.getCRPlayer(player);
-   }
-
-   public MinecraftConfiguration getPlayerConfig() {
-      return this.playerData.getConfig();
    }
 
    public Language getLang(Player player) {
