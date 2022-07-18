@@ -1,5 +1,5 @@
 # CubeRunner plugin
-# Made by EgoLeX
+# Made by EgoLeX (edit by EinfacheSache aka CubeAttack)
 # de.yml - Language file
 
 languageName: "Deutsche"
@@ -12,11 +12,9 @@ version: "&5Version: &7%version%"
 description: "&dTippe &5/%command% help &d für eine Liste aller Kommandos."
 
 errorPermission: "&4Du hast die nicht die benötigten Rechte um dies zu tun"
-###UNTRANSLATED###
-errorCommand: "&cCommand not found.  Type &8/%cmd% help &cfor help."
+errorCommand: "&cBefehl nicht gefunden. Geben Sie &8/%cmd% help &cfür Hilfe ein."
 errorTeleport: "&cDu kannst dich nicht teleportieren während du dich im Spiel befindest. Tippe &7/cr quit &cum zu verlassen."
-###UNTRANSLATED###
-errorMissingArena: "&cYou need to specify a valid arena."
+errorMissingArena: "&cSie müssen eine gültige Arena angeben."
 errorAlreadyInGame: "&cDu bist bereits in einem CubeRunner Spiel."
 errorNotInGame: "&cDu befindest dich derzeit in keinem CubeRunner Spiel."
 
@@ -43,17 +41,19 @@ startStop: "&cDer Countdown wurde gestoppt. Nicht genügend Spieler."
 
 endCrushPlayer: "&dDu bist mit einem Score von &5%score%&d rausgeflogen. Spiel Vorbei!"
 endCrushOthers: "&f%player% &dist mit einem Score von &5%score%&d rausgeflogen."
-###UNTRANSLATED###
-endHidePlayer: "&dYou have been kicked out of the game for hiding under a block."
-###UNTRANSLATED###
-endHideOthers: "&f%player% &dhave been kicked out of the game for hiding under a block."
+endHidePlayer: "&dDu wurdest aus dem Spiel geworfen, weil du dich unter einem Block versteckt hast."
+endHideOthers: "&f%player% &dwurden aus dem Spiel geworfen, weil er sich unter einem Block versteckt hat"
 endTeleport: "&dSpiel Vorbei. Teleport zurück in 5 Sekunden..."
 endBest: "&6Glückwunsch an &f%player% &6welcher den neuen Highscore von &4%score% &6in der Arena &5%arena% hält."
 endReward: "&dDu hast %amount%%currency% für das Überleben von %amount2% Sekunden bekommen."
-###UNTRANSLATED###
-endBroadcastMultiplayer: "&6Congradulation to &f%player% &6who won a multiplayer game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"
-###UNTRANSLATED###
-endBroadcastSingleplayer: "&f%player% &6finished a game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"
+endBroadcastMultiplayer: "&6Herzlichen Glückwunsch an &f%player% &6der ein Multiplayer-Spiel von CubeRunner in der Arena &5%arena% &6mit einer Punktzahl von &4%score%&6 gewonnen hat!"
+endBroadcastSingleplayer: "&f%player% &6hat ein CubeRunner-Spiel in der Arena &5%arena% &6mit einer Punktzahl von &4%score%&6 beendet!"
+
+guiBack: "&cZurück"
+shopGuiTitle: "&6Shop"
+shopBlocksTitle: "&6Shop - Blöcke"
+shopPetsTitle: "&6Shop - Tiere"
+shopWeaponsTitle: "&6Shop - Waffen"
 
 statsGuiTitle: "&6Stats"
 statsInfoAverageScore: "&bEigener Score pro Arena"
@@ -82,8 +82,7 @@ achievementKillerBunny: "&dDer Todeshase"
 editCreateNoname: "&cDu musst einen Namen für deine Arena wählen."
 editNewSuccess: "&aEine Arena namens &2%arena% &awurde erfolgreich erstellt."
 editNewExists: "&cEine Arena namens &4%arena% &cexistiert bereits."
-###UNTRANSLATED###
-editNewLongName: "&cThe arena's name can't be more than 12 letters long."
+editNewLongName: "&cDer Name der Arena darf nicht länger als 12 Buchstaben sein."
 editErrorArena: "&cEine Arena namens &4%arena% &cexistiert nicht."
 editRegionWorldedit: "&cDu musst erst eine WorldEdit Region festlegen."
 editRegion: "&aZone erfolgreich gesetzt für &2%arena%&a."
@@ -127,12 +126,9 @@ keyWordSignQuit: "&cVerlassen"
 keyWordSignStart: "&9Spiel starten"
 keyWordSignStats: "&6Statistiken"
 keyWordSignPlay: "&aSpielen"
-###UNTRANSLATED###
-keyWordSignTop: "&bBest Score"
-
+keyWordSignTop: "&bBester Score"
 keyWordGuiInstructions: "&6Einleitung"
-###UNTRANSLATED###
-keyWordGuiPage: "&ePage %number%"
+keyWordGuiPage: "&eSeite %number%"
 
 keyWordGameStateUnset: "&7Arena Unset"
 keyWordGameStatReady: "&aBereit"
@@ -190,6 +186,8 @@ cmdDescriptionStartpoint: "&7Setze den Startpunkt der Arena."
 cmdDescriptionSetcolor: "&7Setz die Blockfarbe der Arena"
 cmdDescriptionSetminplayer: "&7Setze die Minimale Spieleranzahl der Arena."
 cmdDescriptionSetmaxplayer: "&7Setze die Maximale Spieleranzahl der Arena."
-cmdDescriptionSetplayerheads: "&7Setze die Spieler Köpfe der Arena."
 cmdDescriptionReload: "&7Reloade die config, die Spieler Daten und die Sprachdatei."
+
+#Commands by EinfacheSache
+cmdSetPlayerheads: "&aDer Spielerkopf nummer %count% wurde für die Arena %arena% gesetzt."
 cmdOpenShop: "&7Der Shop wurde geöffnet."

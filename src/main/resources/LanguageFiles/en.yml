@@ -1,5 +1,5 @@
 # CubeRunner plugin
-# Made by PoutineQc
+# Made by PoutineQc (edit by EinfacheSache aka CubeAttack)
 # en.yml - Language file
 
 languageName: "English"
@@ -48,6 +48,12 @@ endBest: "&6Congratulation to &f%player% &6who got the new best score of &4%scor
 endReward: "&dYou gain %amount%%currency% for surviving %amount2% seconds."
 endBroadcastMultiplayer: "&6Congradulation to &f%player% &6who won a multiplayer game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"
 endBroadcastSingleplayer: "&f%player% &6finished a game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"
+
+guiBack: "&cBack"
+shopGuiTitle: "&6Shop"
+shopBlocksTitle: "&6Shop - Blocks"
+shopPetsTitle: "&6Shop - Pets"
+shopWeaponsTitle: "&6Shop - Weapons"
 
 statsGuiTitle: "&6Stats"
 statsInfoAverageScore: "&bAverage Score Per Game"
@@ -180,3 +186,7 @@ cmdDescriptionSetcolor: "&7Set the block colors for the arena"
 cmdDescriptionSetminplayer: "&7Set the minimum amount of player for an arena."
 cmdDescriptionSetmaxplayer: "&7Set the maximum amount of player for an arena."
 cmdDescriptionReload: "&7Reload the config, the player data and the language files."
+
+#Commands by EinfacheSache
+cmdSetPlayerheads: "&aThe player head number %count% was set for the arena %arena%."
+cmdOpenShop: "&7Shop has been opened."

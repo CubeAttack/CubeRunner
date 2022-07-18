@@ -21,7 +21,6 @@ public class Configuration {
    public boolean autostart;
    public int countdownTime;
    public boolean saveAndClearInventory;
-   public boolean teleportAfterEnding;
    public boolean broadcastStartup;
    public boolean broadcastAchievement;
    public boolean broadcastEndingSingle;
@@ -61,7 +60,6 @@ public class Configuration {
       this.countdownTime = config.getInt("countdownTime", 15);
       this.autostart = config.getBoolean("autostart", true);
       this.saveAndClearInventory = config.getBoolean("saveAndClearInventory", true);
-      this.teleportAfterEnding = config.getBoolean("teleportAfterEnding", true);
       this.broadcastStartup = config.getBoolean("broadcasts.startup", true);
       this.broadcastAchievement = config.getBoolean("broadcasts.achievement", true);
       this.broadcastEndingSingle = config.getBoolean("broadcasts.ending.singleplayer", true);

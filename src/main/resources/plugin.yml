@@ -3,7 +3,7 @@ main : de.cubeattack.cuberunner.CubeRunner
 version: 3.0
 description: Blocks are falling over your head! Can you outrun them?
 api-version: 1.18
-author: CubeAttack
+author: EinfacheSache aka CubeAttack
 prefix: CR
 softdepend:
   - WorldEdit
@@ -110,7 +110,4 @@ permissions:
       cuberunner.admin.edit.amountplayer.maxplayer: true
   cuberunner.admin.edit.amountplayer.minplayer:
     description: Allows to edit the minimum amount of player for an arena
-    default: op
-  cuberunner.admin.edit.amountplayer.minplayer:
-    description: Allows to edit the maximum amount of player for an arena
     default: op

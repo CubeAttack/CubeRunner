@@ -1,6 +1,5 @@
 package de.cubeattack.cuberunner.game;
 
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,10 +22,11 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -36,6 +36,8 @@ public class Arena {
    private static CubeRunner plugin;
    private static MySQL mysql;
    private static List<Arena> arenas = new ArrayList();
+   private static List<String> chunks = new ArrayList();
+   private static HashMap<Integer, Location> heads = new HashMap();
    private String name;
    private World world;
    private Location minPoint;
@@ -54,8 +56,6 @@ public class Arena {
    private boolean filled;
    // $FF: synthetic field
    private static int[] $SWITCH_TABLE$me$poutineqc$cuberunner$game$GameState;
-
-   private static HashMap<Integer, Location> heads = new HashMap();
 
    public Arena(CubeRunner plugin) {
       this.gameState = GameState.UNREADY;
@@ -117,6 +117,7 @@ public class Arena {
       this.setNullIfDefault();
       arenas.add(this);
       this.resetScoreboard();
+      this.forceChunkLoad();
    }
 
    private void resetScoreboard() {
@@ -298,7 +299,7 @@ public class Arena {
          if (mysql.hasConnection()) {
             mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET headLoc" + count  + "='" + locAsString + "' WHERE name='" + this.name + "';");
          }
-         local.sendMsg(player, local.get(Language.Messages.COMMAND_SETHEADS));
+         local.sendMsg(player, local.get(Language.Messages.COMMAND_SETHEADS).replace("%arena%", this.name).replace("%count%", String.valueOf(count)));
       }
    }
 
@@ -592,6 +593,18 @@ public class Arena {
 
    }
 
+   private void forceChunkLoad(){
+      for (int x = this.minPoint.getBlockX(); x <= this.maxPoint.getBlockX(); x++) {
+         for (int z = this.minPoint.getBlockZ(); z <= this.maxPoint.getBlockZ(); z++) {
+            String chunk = x + "#" + z + "#" + world;
+            if (chunks.contains(chunk)) continue;
+            chunks.add(chunk);
+            world.loadChunk(x, z);
+            world.setChunkForceLoaded(x, z, true);
+         }
+      }
+   }
+
    private void resetArena() {
       for(int x = this.minPoint.getBlockX(); x <= this.maxPoint.getBlockX(); ++x) {
          for(int y = this.maxPoint.getBlockY(); y >= this.minPoint.getBlockY(); --y) {
@@ -626,107 +639,105 @@ public class Arena {
    }
 
    private static void blockShower(final long number, final Arena arena) {
-      Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-         public void run() {
-            if (arena.getAmountOfPlayerInGame() != 0) {
-               User user;
-               Iterator var2;
-               if (!arena.filled && arena.isArenaFull()) {
-                  arena.filled = true;
-                  var2 = arena.users.iterator();
-
-                  while(var2.hasNext()) {
-                     user = (User)var2.next();
-                     if (!user.isEliminated()) {
-                        try {
-                           user.getCRPlayer().doneChallenge(CRStats.FILL_THE_ARENA);
-                        } catch (CRPlayer.PlayerStatsException var19) {
-                           var19.printStackTrace();
-                        }
-                     }
-                  }
-               }
-
-               if (number == 6000L) {
-                  var2 = arena.users.iterator();
-
-                  while(var2.hasNext()) {
-                     user = (User)var2.next();
-                     if (!user.isEliminated()) {
-                        try {
-                           user.getCRPlayer().doneChallenge(CRStats.SURVIVE_5_MINUTES);
-                        } catch (CRPlayer.PlayerStatsException var18) {
-                           var18.printStackTrace();
-                        }
-                     }
-                  }
-               }
-
+      Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+         if (arena.getAmountOfPlayerInGame() != 0) {
+            User user;
+            Iterator var2;
+            if (!arena.filled && arena.isArenaFull()) {
+               arena.filled = true;
                var2 = arena.users.iterator();
 
                while(var2.hasNext()) {
                   user = (User)var2.next();
                   if (!user.isEliminated()) {
-                     if (user.getLastTreeSecondsDistance() < 1.0D && user.getScore() >= 2) {
-                        arena.eliminateUser(user, Arena.LeavingReason.HIDING);
-                     }
-
-                     Player player = user.getPlayer();
-                     Location l;
-                     if (arena.maxPoint.getBlockY() > player.getLocation().getBlockY() + 10) {
-                        l = new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 10.0D, player.getLocation().getZ());
-                     } else {
-                        l = new Location(player.getWorld(), player.getLocation().getX(), arena.maxPoint.getY(), player.getLocation().getZ());
-                     }
-
-                     NumberFormat formater = new DecimalFormat("#.#####");
-                     double xOffset = Double.parseDouble(formater.format(l.getX() > 0.0D ? l.getX() % 1.0D : 1.0D + l.getX() % 1.0D).replace(",", "."));
-                     double zOffset = Double.parseDouble(formater.format(l.getZ() > 0.0D ? l.getZ() % 1.0D : 1.0D + l.getZ() % 1.0D).replace(",", "."));
-                     if (xOffset <= 0.7D && xOffset >= 0.3D) {
-                        l.setX(Math.floor(l.getX()) + 0.5D);
-                     }
-
-                     if (zOffset <= 0.7D && zOffset >= 0.3D) {
-                        l.setZ(Math.floor(l.getZ()) + 0.5D);
-                     }
-
-                     player.setSaturation(20.0F);
-                     if (number % 20L == 0L) {
-                        player.setLevel((int)number / 20);
-                        player.setSaturation(20.0F);
-                        user.addToScore();
-                        arena.objective.getScore(user.getName()).setScore(user.getScore());
-
-                        try {
-                           user.getCRPlayer().increment(CRStats.TOTAL_SCORE, false);
-                        } catch (CRPlayer.PlayerStatsException var16) {
-                           var16.printStackTrace();
-                        }
-                     }
-
-                     ItemStackManager itemStack = arena.colorManager.getRandomAvailableBlock();
-
                      try {
-                        BlockData iBlockData = itemStack.getItem().getType().createBlockData();
-                        FallingBlock entityFallingBlock = l.getWorld().spawnFallingBlock(l, iBlockData);
-                        entityFallingBlock.setCustomName(player.getUniqueId().toString());
-                        entityFallingBlock.setCustomNameVisible(false);
-                        entityFallingBlock.setDropItem(false);
-                        entityFallingBlock.setTicksLived(1);
-                        entityFallingBlock.setHurtEntities(true);
-
-                        if (number % 2L == 0L) {
-                           entityFallingBlock.setVelocity(new Vector((1.0D - Math.random() * 2.0D) / 10.0D, 0, (1.0D - Math.random() * 2.0D) / 10.0D));
-                        }
-
-                     } catch (Exception var17) {
-                        var17.printStackTrace();
+                        user.getCRPlayer().doneChallenge(CRStats.FILL_THE_ARENA);
+                     } catch (CRPlayer.PlayerStatsException var19) {
+                        var19.printStackTrace();
                      }
                   }
                }
-
-               Arena.blockShower(number + 1L, arena);
             }
+
+            if (number == 6000L) {
+               var2 = arena.users.iterator();
+
+               while(var2.hasNext()) {
+                  user = (User)var2.next();
+                  if (!user.isEliminated()) {
+                     try {
+                        user.getCRPlayer().doneChallenge(CRStats.SURVIVE_5_MINUTES);
+                     } catch (CRPlayer.PlayerStatsException var18) {
+                        var18.printStackTrace();
+                     }
+                  }
+               }
+            }
+
+            var2 = arena.users.iterator();
+
+            while(var2.hasNext()) {
+               user = (User)var2.next();
+               if (!user.isEliminated()) {
+                  if (user.getLastTreeSecondsDistance() < 1.0D && user.getScore() >= 2) {
+                     arena.eliminateUser(user, LeavingReason.HIDING);
+                  }
+
+                  Player player = user.getPlayer();
+                  Location l;
+                  if (arena.maxPoint.getBlockY() > player.getLocation().getBlockY() + 10) {
+                     l = new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY() + 10.0D, player.getLocation().getZ());
+                  } else {
+                     l = new Location(player.getWorld(), player.getLocation().getX(), arena.maxPoint.getY(), player.getLocation().getZ());
+                  }
+
+                  NumberFormat formater = new DecimalFormat("#.#####");
+                  double xOffset = Double.parseDouble(formater.format(l.getX() > 0.0D ? l.getX() % 1.0D : 1.0D + l.getX() % 1.0D).replace(",", "."));
+                  double zOffset = Double.parseDouble(formater.format(l.getZ() > 0.0D ? l.getZ() % 1.0D : 1.0D + l.getZ() % 1.0D).replace(",", "."));
+                  if (xOffset <= 0.7D && xOffset >= 0.3D) {
+                     l.setX(Math.floor(l.getX()) + 0.5D);
+                  }
+
+                  if (zOffset <= 0.7D && zOffset >= 0.3D) {
+                     l.setZ(Math.floor(l.getZ()) + 0.5D);
+                  }
+
+                  player.setSaturation(20.0F);
+                  if (number % 20L == 0L) {
+                     player.setLevel((int)number / 20);
+                     player.setSaturation(20.0F);
+                     user.addToScore();
+                     arena.objective.getScore(user.getName()).setScore(user.getScore());
+
+                     try {
+                        user.getCRPlayer().increment(CRStats.TOTAL_SCORE, false);
+                     } catch (CRPlayer.PlayerStatsException var16) {
+                        var16.printStackTrace();
+                     }
+                  }
+
+                  ItemStackManager itemStack = user.getRandomAvailableBlock();
+
+                  try {
+                     BlockData iBlockData = itemStack.getItem().getType().createBlockData();
+                     FallingBlock entityFallingBlock = l.getWorld().spawnFallingBlock(l, iBlockData);
+                     entityFallingBlock.setCustomName(player.getUniqueId().toString());
+                     entityFallingBlock.setCustomNameVisible(false);
+                     entityFallingBlock.setDropItem(false);
+                     entityFallingBlock.setTicksLived(1);
+                     entityFallingBlock.setHurtEntities(true);
+
+                     if (number % 2L == 0L) {
+                        entityFallingBlock.setVelocity(new Vector((1.0D - Math.random() * 2.0D) / 10.0D, 0, (1.0D - Math.random() * 2.0D) / 10.0D));
+                     }
+
+                  } catch (Exception var17) {
+                     var17.printStackTrace();
+                  }
+               }
+            }
+
+            Arena.blockShower(number + 1L, arena);
          }
       }, 1L);
    }
@@ -1034,23 +1045,15 @@ public class Arena {
       Head.updateHeads(this);
 
       this.resetScoreboard();
-      if (CubeRunner.get().getConfiguration().teleportAfterEnding) {
-         var3 = this.users.iterator();
 
-         while(var3.hasNext()) {
-            User u = (User)var3.next();
-            local = u.getCRPlayer().getLanguage();
-            local.sendMsg(u, local.get(Language.Messages.END_TELEPORT));
-         }
-         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            public void run() {
-               Arena.this.kickUsers(false);
-            }
-         }, 5L);
-      } else {
-         this.kickUsers(true);
+      var3 = this.users.iterator();
+
+      while(var3.hasNext()) {
+         User u = (User)var3.next();
+         local = u.getCRPlayer().getLanguage();
+         local.sendMsg(u, local.get(Language.Messages.END_TELEPORT));
       }
-
+      Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> Arena.this.kickUsers(false), 5L);
    }
 
    public User getHighestScore() {

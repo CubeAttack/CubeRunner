@@ -2,11 +2,13 @@ package de.cubeattack.cuberunner;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import de.cubeattack.cuberunner.game.Arena;
 import de.cubeattack.cuberunner.commands.signs.CRSign;
 import de.cubeattack.cuberunner.game.Head;
+import de.cubeattack.cuberunner.game.User;
 import de.cubeattack.cuberunner.listeners.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -37,12 +39,14 @@ public class CubeRunner extends JavaPlugin {
 
       if (!this.initialiseEconomy()) {
          this.getServer().getPluginManager().disablePlugin(this);
+         return;
       }
 
       this.playerData = new PlayerData(this);
       this.playerData.loadPlayers(plugin);
       this.achievementManager = new AchievementManager(this);
       CRSign.setVariables(this);
+      User.setVariables(this);
       Head.setVariables(this);
       new Arena(this);
       Objects.requireNonNull(this.getCommand("cuberunner")).setExecutor(new ListenerCommand());

@@ -1,14 +1,24 @@
 package de.cubeattack.cuberunner.game;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+
 import de.cubeattack.cuberunner.CRPlayer;
 import de.cubeattack.cuberunner.Configuration;
+import de.cubeattack.cuberunner.CubeRunner;
+import de.cubeattack.cuberunner.MySQL;
+import de.cubeattack.cuberunner.utils.ItemStackManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 public class User {
+   private static Plugin plugin;
+   private static MySQL mysql;
    private CRPlayer player;
    private String displayName;
    private OriginalPlayerStats originalStats;
@@ -19,18 +29,51 @@ public class User {
    private int jump = 0;
    private boolean jumping = false;
    private double distanceRan = 0.0D;
+   private List<ItemStackManager> onlyChoosenBlocks;
    private HashMap<Long, Double> totalDistance = new HashMap();
+
+   public static void setVariables(CubeRunner plugin) {
+      User.plugin = plugin;
+      mysql = plugin.getMySQL();
+   }
+
 
    public User(Configuration config, CRPlayer player, Arena arena, boolean eliminated, boolean tpAuto) {
       this.player = player;
       this.displayName = player.getPlayer().getDisplayName();
       this.eliminated = eliminated;
+      this.onlyChoosenBlocks = new ArrayList<>();
       this.originalStats = new OriginalPlayerStats(config, player.getPlayer());
       this.originalStats.ifillOtherStats(player.getPlayer());
       this.imaxStats();
       if (tpAuto) {
          player.getPlayer().teleport(arena.getLobby());
       }
+
+      if (mysql.hasConnection()) {
+         ResultSet query = mysql.query("SELECT * FROM " + config.tablePrefix + "PLAYERS WHERE UUID='" + getPlayer().getUniqueId() + "';");
+         try {
+            while(query.next()) {
+               if(query.getString("selectedBlocks") != null){
+                  for (String s: query.getString("selectedBlocks").split(", ")) {
+                     onlyChoosenBlocks.add(new ItemStackManager(Material.getMaterial(s)));
+                  }
+               }else if (query.getString("owningBlocks") != null){
+                  for (String s : query.getString("owningBlocks").split(", ")) {
+                     onlyChoosenBlocks.add(new ItemStackManager(Material.getMaterial(s)));
+                  }
+               }else{
+                  onlyChoosenBlocks.add(new ItemStackManager(Material.WHITE_WOOL));
+               }
+            }
+         } catch (SQLException ex) {
+            ex.printStackTrace();
+         }
+      }
+   }
+
+   public ItemStackManager getRandomAvailableBlock(){
+      return this.onlyChoosenBlocks.get((int)Math.floor(Math.random() * (double)this.onlyChoosenBlocks.size()));
    }
 
    public User(int time) {

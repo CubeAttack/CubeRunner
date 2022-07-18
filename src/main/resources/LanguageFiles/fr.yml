@@ -1,5 +1,5 @@
 # CubeRunner plugin
-# Made by PoutineQc
+# Made by PoutineQc (edit by EinfacheSache aka CubeAttack)
 # fr.yml - Language file
 
 languageName: "Francais"
@@ -48,6 +48,13 @@ endBest: "&6Bravo à &f%player% &6qui a fait le nouveau record de &4%score% &6da
 endReward: "&dTu gagne %amount%%currency% pour avoir survécu %amount2% secondes."
 endBroadcastMultiplayer: "&6Félicitation à &f%player% &6qui vient de gagner une partie multijoueur de CubeRunner dans l'arène &5%arena% &6avec un score de &4%score%&6!"
 endBroadcastSingleplayer: "&f%player% &6a fini une partie de CubeRunner dans l'arène &5%arena% &6avec un score de &4%score%&6!"
+
+###UNTRANSLATED###
+guiBack: "&cBack"
+shopGuiTitle: "&6Shop"
+shopBlocksTitle: "&6Shop - Blocks"
+shopPetsTitle: "&6Shop - Pets"
+shopWeaponsTitle: "&6Shop - Weapons"
 
 statsGuiTitle: "&6Statistiques"
 statsInfoAverageScore: "&bScore moyen par partie"
@@ -180,3 +187,8 @@ cmdDescriptionSetcolor: "&7Séléctionne les couleurs dans l'arène séléctionn
 cmdDescriptionSetminplayer: "&7Configure le nombre de joueurs minimum pour l'arène séléctionée."
 cmdDescriptionSetmaxplayer: "&7Configure le nombre de joueurs maximum pour l'arène séléctionée."
 cmdDescriptionReload: "&7Relance le fichier de config, le player data et les fichiers de langues."
+
+###UNTRANSLATED###
+#Commands by EinfacheSache
+cmdSetPlayerheads: "&a&aLe numéro de tête de joueur %count% a été défini pour l'arène %arena%."
+cmdOpenShop: "&7La boutique a été ouverte."

@@ -81,7 +81,7 @@ public class Head {
                 sign.update();
             }
         }else{
-            CubeRunner.get().getLogger().severe("No Sign is placed at one or more positions under the player heads!");
+            CubeRunner.get().getLogger().severe("No Sign is placed in arena '" + arena.getName() + "' at one or more positions under the player heads!");
         }
     }
 
@@ -97,7 +97,7 @@ public class Head {
                     skull.update();
                 }
             }else{
-                CubeRunner.get().getLogger().severe("No head is placed at one or more positions of the player heads!");
+                CubeRunner.get().getLogger().severe("No head is placed in arena '" + arena.getName() + "' at one or more positions of the player heads!");
             }
         }
 
@@ -156,9 +156,10 @@ public class Head {
     public static void loadHeads(){
         if (mysql.hasConnection()) {
             ResultSet query = mysql.query("SELECT * FROM " + config.tablePrefix + "ARENAS;");
+            Arena arena = null;
             try {
                 while(query.next()) {
-                    Arena arena = Arena.getArena(query.getString("name"));
+                    arena = Arena.getArena(query.getString("name"));
                     String[] headLocString1 = query.getString("headLoc1").split(", ");
                     String[] headLocString2 = query.getString("headLoc2").split(", ");;
                     String[] headLocString3 = query.getString("headLoc3").split(", ");;
@@ -183,7 +184,7 @@ public class Head {
                     arena.getHeadsList().put(2, headLoc3);
                 }
             } catch (SQLException | NullPointerException ex) {
-                CubeRunner.get().getLogger().warning("Playerhead locations aren't set!");
+                CubeRunner.get().getLogger().warning("Playerheadlocations maybe aren't set in arena " + (arena != null ? "'" + arena.getName() + "'" : "") + ".");
             }
         }
     }

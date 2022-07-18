@@ -2,12 +2,16 @@ package de.cubeattack.cuberunner;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import de.cubeattack.cuberunner.commands.inventories.CRInventory;
+import de.cubeattack.cuberunner.utils.ItemStackManager;
 import de.cubeattack.cuberunner.utils.MinecraftConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -33,7 +37,6 @@ public class CRPlayer {
             this.stats.put(stats, name);
          }
       }
-
    }
 
    public CRPlayer(ResultSet query) {

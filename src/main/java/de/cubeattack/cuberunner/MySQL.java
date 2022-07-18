@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class MySQL {
    private CubeRunner plugin;
@@ -28,18 +29,16 @@ public class MySQL {
       this.user = user;
       this.password = password;
       this.connect();
-      if (this.hasConnection()) {
+      if (this.hasConnection())
          this.initializeDatabases();
-      }
-
    }
 
    private void initializeDatabases() {
-      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "SIGNS (" + "uuid varchar(64) UNIQUE, type varchar(32)," + "locationWorld varchar(32), locationX INT DEFAULT 0, locationY INT DEFAULT 0, locationZ INT DEFAULT 0);");
+      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "SIGNS (" + "uuid varchar(64) UNIQUE, type varchar(32), locationWorld varchar(32), locationX INT DEFAULT 0, locationY INT DEFAULT 0, locationZ INT DEFAULT 0);");
       this.update("ALTER TABLE " + this.prefix + "SIGNS CONVERT TO CHARACTER SET utf8;");
-      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "ARENAS (name varchar(32) UNIQUE,world varchar(32)," + "minAmountPlayer INT DEFAULT 1, maxAmountPlayer INT DEFAULT 8, firstHighestScore varchar(32) DEFAULT 'null, 0', secondHighestScore varchar(32) DEFAULT 'null, 0', thirdHighestScore varchar(32) DEFAULT 'null, 0'," + "colorIndice LONG," + "minPointX INT DEFAULT 0,minPointY INT DEFAULT 0,minPointZ INT DEFAULT 0," + "maxPointX INT DEFAULT 0, maxPointY INT DEFAULT 0,maxPointZ INT DEFAULT 0," + "lobbyX DOUBLE DEFAULT 0,lobbyY DOUBLE DEFAULT 0,lobbyZ DOUBLE DEFAULT 0," + "lobbyPitch FLOAT DEFAULT 0,lobbyYaw FLOAT DEFAULT 0," + "startPointX DOUBLE DEFAULT 0,startPointY DOUBLE DEFAULT 0,startPointZ DOUBLE DEFAULT 0," + "startPointPitch FLOAT DEFAULT 0,startPointYaw FLOAT DEFAULT 0," + "headLoc1 varchar(32) DEFAULT null," + "headLoc2 varchar(32) DEFAULT null," + "headLoc3 varchar(32) DEFAULT null);");
+      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "ARENAS (name varchar(32) UNIQUE,world varchar(32), minAmountPlayer INT DEFAULT 1, maxAmountPlayer INT DEFAULT 8, firstHighestScore varchar(32) DEFAULT 'null, 0', secondHighestScore varchar(32) DEFAULT 'null, 0', thirdHighestScore varchar(32) DEFAULT 'null, 0', colorIndice LONG, minPointX INT DEFAULT 0, minPointY INT DEFAULT 0, minPointZ INT DEFAULT 0, maxPointX INT DEFAULT 0, maxPointY INT DEFAULT 0, maxPointZ INT DEFAULT 0, lobbyX DOUBLE DEFAULT 0, lobbyY DOUBLE DEFAULT 0, lobbyZ DOUBLE DEFAULT 0, lobbyPitch FLOAT DEFAULT 0, lobbyYaw FLOAT DEFAULT 0, startPointX DOUBLE DEFAULT 0, startPointY DOUBLE DEFAULT 0, startPointZ DOUBLE DEFAULT 0, startPointPitch FLOAT DEFAULT 0, startPointYaw FLOAT DEFAULT 0, headLoc1 varchar(32) DEFAULT null, headLoc2 varchar(32) DEFAULT null, headLoc3 varchar(32) DEFAULT null);");
       this.update("ALTER TABLE " + this.prefix + "ARENAS CONVERT TO CHARACTER SET utf8;");
-      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "PLAYERS (UUID varchar(64) UNIQUE, name varchar(64), language varchar(32), timePlayed INT DEFAULT 0," + "money DOUBLE DEFAULT 0, averageDistancePerGame DOUBLE DEFAULT 0, totalDistance DOUBLE DEFAULT 0," + "games INT DEFAULT 0, totalScore INT DEFAULT 0, kills INT DEFAULT 0, multiplayerWon INT DEFAULT 0," + "survive5Minutes BOOLEAN DEFAULT FALSE, reachHeight10 BOOLEAN DEFAULT FALSE," + "fillTheArena BOOLEAN DEFAULT FALSE, theAnswerToLife BOOLEAN DEFAULT FALSE," + "theRageQuit BOOLEAN DEFAULT FALSE, theKillerBunny BOOLEAN DEFAULT FALSE);");
+      this.update("CREATE TABLE IF NOT EXISTS " + this.prefix + "PLAYERS (UUID varchar(64) UNIQUE, name varchar(64), language varchar(32), timePlayed INT DEFAULT 0, money DOUBLE DEFAULT 0, owningBlocks varchar(32) DEFAULT 'WHITE_WOOL', selectedBlocks varchar(32), owningPets varchar(32), selectedPet varchar(32), owningWeapons varchar(32), selectedWeapon varchar(32), averageDistancePerGame DOUBLE DEFAULT 0, totalDistance DOUBLE DEFAULT 0, games INT DEFAULT 0, totalScore INT DEFAULT 0, kills INT DEFAULT 0, multiplayerWon INT DEFAULT 0, survive5Minutes BOOLEAN DEFAULT FALSE, reachHeight10 BOOLEAN DEFAULT FALSE, fillTheArena BOOLEAN DEFAULT FALSE, theAnswerToLife BOOLEAN DEFAULT FALSE, theRageQuit BOOLEAN DEFAULT FALSE, theKillerBunny BOOLEAN DEFAULT FALSE);");
       this.update("ALTER TABLE " + this.prefix + "PLAYERS CONVERT TO CHARACTER SET utf8;");
    }
 
@@ -68,10 +67,10 @@ public class MySQL {
             @Override
             public void run() {
                if(count <= 0) {
-                  Bukkit.getServer().shutdown();
+                  Bukkit.getPluginManager().disablePlugin(CubeRunner.get());
                   return;
                }
-               plugin.getLogger().severe("Server stopped due to missing mysql connect in " + count +  " seconds.");
+               plugin.getLogger().severe("Plugin stopped due to missing mysql connect in " + count +  " seconds.");
                count--;
             }
          }, 20, 20);

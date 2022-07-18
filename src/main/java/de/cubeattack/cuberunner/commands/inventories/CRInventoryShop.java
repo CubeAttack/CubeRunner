@@ -31,7 +31,7 @@ public class CRInventoryShop extends CRInventory {
         Language local = this.crPlayer.getLanguage();
         if (Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_WEAPONS_TITLE))) {
             new CRInventoryWeapons(crPlayer);
-        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCK_TITLE))) {
+        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCKS_TITLE))) {
             new CRInventoryBlocks(crPlayer);
         }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_PETS_TITLE))) {
             new CRInventoryPets(crPlayer);
@@ -56,7 +56,7 @@ public class CRInventoryShop extends CRInventory {
 
         icon = new InventoryItem(new ItemStackManager(Material.SANDSTONE));
         icon.setPosition(13);
-        icon.getItem().setDisplayName(local.get(Language.Messages.SHOP_BLOCK_TITLE));
+        icon.getItem().setDisplayName(local.get(Language.Messages.SHOP_BLOCKS_TITLE));
         icon.addToInventory(this.inventory);
 
         icon = new InventoryItem(new ItemStackManager(Material.VILLAGER_SPAWN_EGG));

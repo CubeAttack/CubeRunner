@@ -10,6 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Locale;
+
 public class CRInventoryPets extends CRInventory {
 
     public CRInventoryPets(CRPlayer crPlayer) {
@@ -30,7 +32,7 @@ public class CRInventoryPets extends CRInventory {
         Language local = this.crPlayer.getLanguage();
         if (Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.GUI_Back))) {
             new CRInventoryShop(crPlayer);
-        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCK_TITLE))) {
+        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCKS_TITLE))) {
             crPlayer.getPlayer().sendMessage("Test2");
         }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_PETS_TITLE))) {
             crPlayer.getPlayer().sendMessage("Test2");

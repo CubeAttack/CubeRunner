@@ -30,7 +30,7 @@ public class CRInventoryWeapons extends CRInventory {
         Language local = this.crPlayer.getLanguage();
         if (Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.GUI_Back))) {
             new CRInventoryShop(crPlayer);
-        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCK_TITLE))) {
+        }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_BLOCKS_TITLE))) {
             crPlayer.getPlayer().sendMessage("Test2");
         }else if(Utils.isEqualOnColorStrip(itemStack.getItemMeta().getDisplayName(), local.get(Language.Messages.SHOP_PETS_TITLE))) {
             crPlayer.getPlayer().sendMessage("Test2");

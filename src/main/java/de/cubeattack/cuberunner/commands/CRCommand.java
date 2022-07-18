@@ -533,7 +533,7 @@ public enum CRCommand {
          }
       }
    },
-   SHOP("shop", Language.Messages.COMMAND_SETHEADS, "cuberunner.shop", "/%command% shop", CRCommandType.GAME) {
+   SHOP("shop", Language.Messages.COMMAND_SHOP, "cuberunner.shop", "/%command% shop", CRCommandType.GAME) {
       public void execute(CubeRunner plugin, Player player, String[] args, Object... extra) {
          Language local = CubeRunner.get().getLang(player);
          local.sendMsg(player, local.get(Language.Messages.COMMAND_SHOP));

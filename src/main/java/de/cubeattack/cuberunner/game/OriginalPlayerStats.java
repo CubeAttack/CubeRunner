@@ -58,9 +58,8 @@ public class OriginalPlayerStats {
          player.updateInventory();
       }
 
-      if (this.config.teleportAfterEnding) {
-         player.teleport(this.location);
-      }
+
+      player.teleport(this.location);
 
    }
 

@@ -146,7 +146,7 @@ public class Language {
       END_BROADCAST_SINGLEPLAYER("endBroadcastSingleplayer", "&f%player% &6finished a game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"),
       GUI_Back("GuiBack", "&cBack"),
       SHOP_GUI_TITLE("shopGuiTitle", "&6Shop"),
-      SHOP_BLOCK_TITLE("shopBlockTitle", "&6Shop - Block"),
+      SHOP_BLOCKS_TITLE("shopBlocksTitle", "&6Shop - Blocks"),
       SHOP_PETS_TITLE("shopPetsTitle", "&6Shop - Pets"),
       SHOP_WEAPONS_TITLE("shopWeaponsTitle", "&6Shop - Weapons"),
       STATS_GUI_TITLE("statsGuiTitle", "&6Stats"),
@@ -264,10 +264,11 @@ public class Language {
       COMMAND_SETSTARTPOINT("cmdDescriptionStartpoint", "&7Set the start point of the selected arena."),
       COMMAND_SETMINPLAYER("cmdDescriptionSetminplayer", "&7Set the minimum amount of player for an arena."),
       COMMAND_SETMAXPLAYER("cmdDescriptionSetmaxplayer", "&7Set the maximum amount of player for an arena."),
-      COMMAND_SETHEADS("cmdDescriptionSetplayerheads", "&7Set player heads for an arena."),
       COMMAND_SETCOLOR("cmdDescriptionSetcolor", "&7Set the block colors for the arena"),
       COMMAND_SHOP("cmdOpenShop", "&7Shop has been Open"),
-      COMMAND_RELOAD("cmdDescriptionReload", "&7Reload the config, the player data and the language files.");
+      COMMAND_RELOAD("cmdDescriptionReload", "&7Reload the config, the player data and the language files."),
+
+      COMMAND_SETHEADS("cmdSetPlayerheads", "&aThe player head number %count% was set for the arena %arena%.");
 
       private String key;
       private String defaultMessage;

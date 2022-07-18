@@ -18,16 +18,15 @@
 ############################################################
 
 # Currently available languages:
+# "de" - Deutsch
 # "fr" - Francais
 # "en" - English
-# "de" - Deutsch
 # You may make another YAML file with another language
 # Simply put it in the LanguageFiles folder and write it's name here (without the ".yml")
 # This will option will be the "CR server language".. The signs will be in this language.
 # Warning: If you change this, a simple /dac reload won't do, you'll have to restart the server.
 language: 'de'
 
-# Set to true if you have a MySQL database and fill the information below
 # Warning: If you change this, a simple /dac reload won't do, you'll have to restart the server.
 host: 127.0.0.1
 port: 3306
@@ -45,15 +44,12 @@ autostart: true
 
 # The countdown from the moment a players starts the game to the beginning of the block shower. (in seconds)
 # Players may still join the game during this countdown
-countdownTime: 15
+countdownTime: 10
 
 # Set to true if you want player's inventories to be cleared during a game and returned after it.
 # Note : If the server crash of the plugin throws an error (which should not happend) during a game,
-#   the player will permenantly loose it's inventory
+# the player will permenantly loose it's inventory
 saveAndClearInventory: true
-
-# Set to true if you want players to get back to their original location after the end of the game
-teleportAfterEnding: true
 
 # Broadcasts
 # True to enable - False to disable
@@ -73,7 +69,7 @@ broadcasts:
 
 # Economy Rewards
 # Requires Vault and an economy plugin
-economyRewards: false
+economyRewards: true
 
 # Reward at the end of the game
 # The reward will be the amount selected below times the score of the player
