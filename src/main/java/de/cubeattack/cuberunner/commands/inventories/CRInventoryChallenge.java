@@ -36,7 +36,7 @@ public class CRInventoryChallenge extends CRInventory {
 
    public void fillInventory() throws CRPlayer.PlayerStatsException {
       Language local = this.crPlayer.getLanguage();
-      InventoryItem icon = new InventoryItem(new ItemStackManager(Material.LEGACY_STAINED_GLASS_PANE));
+      InventoryItem icon = new InventoryItem(new ItemStackManager(Material.GRAY_STAINED_GLASS_PANE));
       icon.getItem().setData((short)10);
       icon.getItem().setDisplayName("" + ChatColor.RED);
       int i = 0;

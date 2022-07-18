@@ -6,10 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
@@ -23,14 +20,9 @@ import de.cubeattack.cuberunner.commands.signs.CRSign;
 import de.cubeattack.cuberunner.utils.ItemStackManager;
 import de.cubeattack.cuberunner.utils.Permissions;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -50,8 +42,7 @@ public class Arena {
    private Location maxPoint;
    private Location lobby;
    private Location startPoint;
-   private int highestScore;
-   private String highestPlayer;
+   private String[] highestScore;
    private int minAmountPlayer;
    private int maxAmountPlayer;
    private ColorManager colorManager;
@@ -82,8 +73,7 @@ public class Arena {
       Location startPoint;
       int minAmountPlayer;
       int maxAmountPlayer;
-      int highestScore;
-      String highestPlayer;
+      String[] highestScore;
       if (mysql.hasConnection()) {
          try {
             ResultSet arenas = mysql.query("SELECT * FROM " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS;");
@@ -102,9 +92,8 @@ public class Arena {
                startPoint.setYaw(arenas.getFloat("startPointYaw"));
                minAmountPlayer = arenas.getInt("minAmountPlayer");
                maxAmountPlayer = arenas.getInt("maxAmountPlayer");
-               highestScore = arenas.getInt("highestScore");
-               highestPlayer = arenas.getString("highestPlayer");
-               new Arena(name, world, minPoint, maxPoint, lobby, startPoint, minAmountPlayer, maxAmountPlayer, highestScore, highestPlayer, colorIndice);
+               highestScore = arenas.getString("firstHighestScore").split(", ");
+               new Arena(name, world, minPoint, maxPoint, lobby, startPoint, minAmountPlayer, maxAmountPlayer, highestScore, colorIndice);
             }
          } catch (SQLException var12) {
             plugin.getLogger().info("[MySQL] Error while loading arenas.");
@@ -112,7 +101,7 @@ public class Arena {
       }
    }
 
-   private Arena(String name, World world, Location minPoint, Location maxPoint, Location lobby, Location startPoint, int minAmountPlayer, int maxAmountPlayer, int highestScore, String highestPlayer, Long colorIndice) {
+   private Arena(String name, World world, Location minPoint, Location maxPoint, Location lobby, Location startPoint, int minAmountPlayer, int maxAmountPlayer, String[] highestScore, Long colorIndice) {
       this.gameState = GameState.UNREADY;
       this.multiplayerGame = false;
       this.name = name;
@@ -124,7 +113,6 @@ public class Arena {
       this.minAmountPlayer = minAmountPlayer;
       this.maxAmountPlayer = maxAmountPlayer;
       this.highestScore = highestScore;
-      this.highestPlayer = highestPlayer;
       this.colorManager = new ColorManager(colorIndice, plugin, this);
       this.setNullIfDefault();
       arenas.add(this);
@@ -138,7 +126,7 @@ public class Arena {
       this.objective.setDisplaySlot(DisplaySlot.SIDEBAR);
       this.objective.setDisplayName(ChatColor.LIGHT_PURPLE + this.name + ChatColor.WHITE + " : " + ChatColor.GREEN + local.get(Language.Messages.KEYWORD_SCOREBOARD_PLAYERS));
       this.objective.getScore(ChatColor.GREEN + "-------------------").setScore(1);
-      this.objective.getScore(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_BEST_SCORE) + " = " + ChatColor.LIGHT_PURPLE + this.highestScore).setScore(this.highestScore);
+      this.objective.getScore(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_BEST_SCORE) + " = " + ChatColor.LIGHT_PURPLE + this.highestScore[1]).setScore(Integer.parseInt(this.highestScore[1]));
       this.objective.getScore(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_MINIMUM) + " " + local.get(Language.Messages.KEYWORD_SCOREBOARD_PLAYERS) + " = " + ChatColor.LIGHT_PURPLE + this.minAmountPlayer).setScore(2);
       this.objective.getScore(ChatColor.GREEN + local.get(Language.Messages.KEYWORD_INFO_MAXIMUM) + " " + local.get(Language.Messages.KEYWORD_SCOREBOARD_PLAYERS) + " = " + ChatColor.LIGHT_PURPLE + this.maxAmountPlayer).setScore(3);
    }
@@ -150,8 +138,7 @@ public class Arena {
       this.world = player.getWorld();
       arenas.add(this);
       this.colorManager = new ColorManager(1L, plugin, this);
-      this.highestPlayer = "null";
-      this.highestScore = 0;
+      this.highestScore = "null, 0".split(", ");
       this.minAmountPlayer = 1;
       this.maxAmountPlayer = 8;
       this.resetScoreboard();
@@ -195,7 +182,7 @@ public class Arena {
 
    }
 
-   public void setArena(Player player) throws IncompleteRegionException {
+   public void setArena(Player player) {
       Language local = CubeRunner.get().getCRPlayer(player).getLanguage();
       SessionManager manager = WorldEdit.getInstance().getSessionManager();
       Region r;
@@ -343,7 +330,7 @@ public class Arena {
       player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5" + local.get(Language.Messages.KEYWORD_INFO_CURRENT) + " " + local.get(Language.Messages.KEYWORD_INFO_AMOUNT_OF_PLAYER) + ": &7" + this.users.size()));
       player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5" + local.get(Language.Messages.KEYWORD_INFO_MINIMUM) + " " + local.get(Language.Messages.KEYWORD_INFO_AMOUNT_OF_PLAYER) + ": &7" + this.minAmountPlayer));
       player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5" + local.get(Language.Messages.KEYWORD_INFO_MAXIMUM) + " " + local.get(Language.Messages.KEYWORD_INFO_AMOUNT_OF_PLAYER) + ": &7" + this.maxAmountPlayer));
-      player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5" + local.get(Language.Messages.KEYWORD_INFO_BEST_SCORE) + ": &7" + this.highestScore + " &5" + local.get(Language.Messages.KEYWORD_GENERAL_BY) + " &7" + this.highestPlayer));
+      player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&5" + local.get(Language.Messages.KEYWORD_INFO_BEST_SCORE) + ": &7" + this.highestScore + " &5" + local.get(Language.Messages.KEYWORD_GENERAL_BY)));
       player.sendMessage("\n");
       if (Permissions.hasPermission("cuberunner.admin.info", player, false)) {
          player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&8&m" + StringUtils.repeat(" ", 5) + "&r &5CubeRunner &d" + local.get(Language.Messages.KEYWORD_INFO_ADVANCED) + " &5: &d" + this.name + " &8&m" + StringUtils.repeat(" ", 5)));
@@ -609,14 +596,10 @@ public class Arena {
       for(int x = this.minPoint.getBlockX(); x <= this.maxPoint.getBlockX(); ++x) {
          for(int y = this.maxPoint.getBlockY(); y >= this.minPoint.getBlockY(); --y) {
             for(int z = this.minPoint.getBlockZ(); z <= this.maxPoint.getBlockZ(); ++z) {
-               Location location = new Location(this.world, (double)x, (double)y, (double)z);
-               Block block = location.getBlock();
-               if (block.getType().name().toLowerCase().endsWith("clay") || block.getType().name().toLowerCase().endsWith("wool")) {
-                  Iterator var7 = this.colorManager.getOnlyChoosenBlocks().iterator();
-
-                  while(var7.hasNext()) {
-                     ItemStackManager item = (ItemStackManager)var7.next();
-                     if (item.getMaterial().name().endsWith(block.getType().name().split("_")[1])) {
+               Block block =new Location(this.world, x, (double)y, (double)z).getBlock();
+               if (block.getType().name().contains("TERRACOTTA") || block.getType().name().contains("WOOL")) {
+                  for (ItemStackManager item : this.colorManager.getOnlyChoosenBlocks()) {
+                     if (item.getMaterial().name().endsWith(block.getType().name().split("_")[block.getType().name().split("_").length - 1])) {
                         block.setType(Material.AIR);
                         break;
                      }
@@ -625,7 +608,6 @@ public class Arena {
             }
          }
       }
-
    }
 
    public void resetArena(ItemStack item) {
@@ -634,7 +616,7 @@ public class Arena {
             for(int z = this.minPoint.getBlockZ(); z <= this.maxPoint.getBlockZ(); ++z) {
                Location location = new Location(this.world, (double)x, (double)y, (double)z);
                Block block = location.getBlock();
-               if ((block.getType() == Material.CLAY || block.getType() == Material.GRAY_WOOL) && item.getType() == block.getType() && item.getDurability() == block.getData()) {
+               if (item.getType().name().endsWith(block.getType().name().split("_")[block.getType().name().split("_").length-1])) {
                   block.setType(Material.AIR);
                }
             }
@@ -725,15 +707,13 @@ public class Arena {
                      ItemStackManager itemStack = arena.colorManager.getRandomAvailableBlock();
 
                      try {
-                        MaterialData iBlockData = itemStack.getItem().getData();
+                        BlockData iBlockData = itemStack.getItem().getType().createBlockData();
                         FallingBlock entityFallingBlock = l.getWorld().spawnFallingBlock(l, iBlockData);
                         entityFallingBlock.setCustomName(player.getUniqueId().toString());
                         entityFallingBlock.setCustomNameVisible(false);
                         entityFallingBlock.setDropItem(false);
                         entityFallingBlock.setTicksLived(1);
                         entityFallingBlock.setHurtEntities(true);
-
-                       // entityFallingBlock.getClass().getMethod("a", Boolean.TYPE).invoke(entityFallingBlock, true);
 
                         if (number % 2L == 0L) {
                            entityFallingBlock.setVelocity(new Vector((1.0D - Math.random() * 2.0D) / 10.0D, 0, (1.0D - Math.random() * 2.0D) / 10.0D));
@@ -797,6 +777,59 @@ public class Arena {
             }
          }
       }
+
+      if (reason == LeavingReason.KILLED) {
+         local = user.getCRPlayer().getLanguage();
+         local.sendMsg(user, "(Test) Du bist durch einen anderen Spieler gestorben");
+         var5 = this.users.iterator();
+
+         while(var5.hasNext()) {
+            u = (User)var5.next();
+            if (u != user) {
+               l = u.getCRPlayer().getLanguage();
+               l.sendMsg(u, l.get(Language.Messages.END_HIDE_OTHERS).replace("%player%", user.getDisplayName()));
+            }
+         }
+      }
+
+      HashMap<OfflinePlayer, Integer> hashMap = Head.getBestPlayersWithScore(this);
+      List<ScorePlayer> list = new ArrayList<>();
+
+      if(!hashMap.containsKey(user.getPlayer())){
+         hashMap.put(user.getPlayer(), user.getScore());
+      }else if(hashMap.get(user.getPlayer()) <= user.getScore()){
+         hashMap.replace(user.getPlayer(), user.getScore());
+      }
+
+      for (OfflinePlayer player : hashMap.keySet()) {
+         list.add(new ScorePlayer(player, hashMap.get(player)));
+      }
+
+      Collections.sort(list, Collections.reverseOrder());
+
+      int i = 0;
+      for (ScorePlayer s: list) {
+         i++;
+         switch (i) {
+            case 1:
+               this.highestScore[1] = String.valueOf(s.score);
+               mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET firstHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+               break;
+            case 2:
+               mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET secondHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+               break;
+            case 3:
+               mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET thirdHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+               break;
+            default:
+               return;
+         }
+
+      }
+
+      user.allowTeleport();
+      user.ireturnStats();
+      this.users.remove(user);
 
       try {
          user.getCRPlayer().increment(CRStats.GAMES_PLAYED, true);
@@ -941,34 +974,64 @@ public class Arena {
    private void endingSequence() {
       this.gameState = GameState.ENDING;
       CRSign.updateSigns(this);
-      Head.updateHeads(this);
-      this.resetArena();
-      User user = this.getHighestScore();
+      Bukkit.getScheduler().runTaskLater(CubeRunner.get(), () -> resetArena(),20);
+      User bestUser = null;
+
+      Iterator var3;
+      Language local;
+      var3 = Bukkit.getServer().getOnlinePlayers().iterator();
+      for (User user : users) {
+         HashMap<OfflinePlayer, Integer> hashMap = Head.getBestPlayersWithScore(this);
+         List<ScorePlayer> list = new ArrayList<>();
+
+         if(!hashMap.containsKey(user.getPlayer())){
+            hashMap.put(user.getPlayer(), user.getScore());
+         }else if(hashMap.get(user.getPlayer()) <= user.getScore()){
+            hashMap.replace(user.getPlayer(), user.getScore());
+         }
+
+         for (OfflinePlayer player : hashMap.keySet()) {
+            list.add(new ScorePlayer(player, hashMap.get(player)));
+         }
+
+         Collections.sort(list, Collections.reverseOrder());
+
+         int i = 0;
+         for (ScorePlayer s: list) {
+            i++;
+            switch (i) {
+               case 1:
+                  this.highestScore[1] = String.valueOf(s.score);
+                  bestUser = user;
+                  while (var3.hasNext()) {
+                     Player player = (Player) var3.next();
+                     local = CubeRunner.get().getCRPlayer(player).getLanguage();
+                     local.sendMsg(player, local.get(Language.Messages.END_BEST).replace("%player%", bestUser.getDisplayName()).replace("%score%", String.valueOf(bestUser.getScore())).replace("%arena%", this.name));
+                  }
+                  mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET firstHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+                  break;
+               case 2:
+                  mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET secondHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+                  break;
+               case 3:
+                  mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET thirdHighestScore='" + s.player.getName() + ", " + s.score + "' WHERE name='" + this.name + "';");
+                  break;
+               default:
+                  return;
+            }
+         }
+      }
+
       if (this.multiplayerGame) {
          try {
-            user.getCRPlayer().increment(CRStats.MULTIPLAYER_WON, true);
+            bestUser.getCRPlayer().increment(CRStats.MULTIPLAYER_WON, true);
          } catch (CRPlayer.PlayerStatsException var5) {
             var5.printStackTrace();
          }
       }
 
-      Iterator var3;
-      Language local;
-      if (user.getScore() > this.highestScore) {
-         this.highestScore = user.getScore();
-         this.highestPlayer = user.getPlayer().getName();
-         var3 = Bukkit.getServer().getOnlinePlayers().iterator();
-
-         while(var3.hasNext()) {
-            Player player = (Player)var3.next();
-            local = CubeRunner.get().getCRPlayer(player).getLanguage();
-            local.sendMsg(player, local.get(Language.Messages.END_BEST).replace("%player%", user.getDisplayName()).replace("%score%", String.valueOf(user.getScore())).replace("%arena%", this.name));
-         }
-
-         if (mysql.hasConnection()) {
-            mysql.update("UPDATE " + CubeRunner.get().getConfiguration().tablePrefix + "ARENAS SET highestScore='" + user.getScore() + "', highestPlayer='" + user.getPlayer().getName() + "' WHERE name='" + this.name + "';");
-         }
-      }
+      Head.loadHeads();
+      Head.updateHeads(this);
 
       this.resetScoreboard();
       if (CubeRunner.get().getConfiguration().teleportAfterEnding) {
@@ -983,7 +1046,7 @@ public class Arena {
             public void run() {
                Arena.this.kickUsers(false);
             }
-         }, 100L);
+         }, 5L);
       } else {
          this.kickUsers(true);
       }
@@ -1135,11 +1198,7 @@ public class Arena {
       return this.startPoint;
    }
 
-   public String getHighestPlayer() {
-      return this.highestPlayer;
-   }
-
-   public int getHighestPlayerScore() {
+   public String[] getHighestPlayerScore() {
       return this.highestScore;
    }
 

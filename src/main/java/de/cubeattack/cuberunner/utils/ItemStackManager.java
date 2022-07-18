@@ -30,7 +30,7 @@ public class ItemStackManager {
       this.durability = itemStack.getDurability();
       ItemMeta meta = itemStack.getItemMeta();
       this.name = meta.hasDisplayName() ? meta.getDisplayName() : null;
-      this.enchantments = (Map)(meta.hasEnchants() ? meta.getEnchants() : new HashMap());
+      this.enchantments = (meta.hasEnchants() ? meta.getEnchants() : new HashMap());
       this.lore = meta.hasLore() ? meta.getLore() : null;
    }
 

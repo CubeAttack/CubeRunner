@@ -9,6 +9,7 @@ import de.cubeattack.cuberunner.CubeRunner;
 import de.cubeattack.cuberunner.Language;
 import de.cubeattack.cuberunner.commands.inventories.CRInventoryColor;
 import de.cubeattack.cuberunner.commands.inventories.CRInventoryJoin;
+import de.cubeattack.cuberunner.commands.inventories.CRInventoryShop;
 import de.cubeattack.cuberunner.commands.inventories.CRInventoryStats;
 import de.cubeattack.cuberunner.game.Arena;
 import de.cubeattack.cuberunner.game.GameState;
@@ -530,8 +531,16 @@ public enum CRCommand {
                }
             }
          }
-
       }
+   },
+   SHOP("shop", Language.Messages.COMMAND_SETHEADS, "cuberunner.shop", "/%command% shop", CRCommandType.GAME) {
+      public void execute(CubeRunner plugin, Player player, String[] args, Object... extra) {
+         Language local = CubeRunner.get().getLang(player);
+         local.sendMsg(player, local.get(Language.Messages.COMMAND_SHOP));
+         new CRInventoryShop(plugin.getCRPlayer(player));
+      }
+
+      public void complete(List<String> tabCompletion, String[] args) {}
    };
 
    private final String commandName;

@@ -18,8 +18,6 @@ public class Language {
    public Language(CubeRunner plugin, String fileName) {
       this.fileName = fileName;
 
-      //FileUtils languageFile = new FileUtils(CubeRunner.get().getResource( "LanguageFiles/" + "de.yml"), "LanguageFiles", fileName, "yml");
-
       MinecraftConfiguration languageFile = new MinecraftConfiguration("LanguageFiles", fileName, true);
       this.langageName = languageFile.get().getString("languageName", null);
       if (this.langageName != null) {
@@ -146,6 +144,10 @@ public class Language {
       END_REWARD("endReward", "&dYou gain %amount%%currency% for surviving %amount2% seconds."),
       END_BROADCAST_MULTIPLAYER("endBroadcastMultiplayer", "&6Congradulation to &f%player% &6who won a multiplayer game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"),
       END_BROADCAST_SINGLEPLAYER("endBroadcastSingleplayer", "&f%player% &6finished a game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"),
+      SHOP_GUI_TITLE("shopGuiTitle", "&6Shop"),
+      SHOP_BLOCK_TITLE("shopBlockTitle", "&6Shop"),
+      SHOP_PETS_TITLE("shopPetsTitle", "&6Shop"),
+      SHOP_WEAPONS_TITLE("shopWeaponsTitle", "&6Shop"),
       STATS_GUI_TITLE("statsGuiTitle", "&6Stats"),
       STATS_INFO_AVERAGE_SCORE("statsInfoAverageScore", "&bAverage Score Per Game"),
       STATS_INFO_DISTANCE_RAN("statsInfoDistanceRan", "&bTotal Distance Ran"),
@@ -263,6 +265,7 @@ public class Language {
       COMMAND_SETMAXPLAYER("cmdDescriptionSetmaxplayer", "&7Set the maximum amount of player for an arena."),
       COMMAND_SETHEADS("cmdDescriptionSetplayerheads", "&7Set player heads for an arena."),
       COMMAND_SETCOLOR("cmdDescriptionSetcolor", "&7Set the block colors for the arena"),
+      COMMAND_SHOP("cmdOpenShop", "&7Shop has been Open"),
       COMMAND_RELOAD("cmdDescriptionReload", "&7Reload the config, the player data and the language files.");
 
       private String key;

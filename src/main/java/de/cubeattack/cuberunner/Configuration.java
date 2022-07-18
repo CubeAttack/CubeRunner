@@ -44,7 +44,7 @@ public class Configuration {
 
    public void loadConfiguration(Plugin plugin) {
       FileConfiguration config = YamlConfiguration.loadConfiguration(this.configFile);
-      this.language = config.getString("language", "en-US");
+      this.language = config.getString("language", "de-DE");
       this.host = config.getString("host", "127.0.0.1");
       if (this.host.equalsIgnoreCase("localhost")) {
          this.host = "127.0.0.1";

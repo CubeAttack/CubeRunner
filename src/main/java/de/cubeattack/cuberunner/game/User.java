@@ -26,12 +26,11 @@ public class User {
       this.displayName = player.getPlayer().getDisplayName();
       this.eliminated = eliminated;
       this.originalStats = new OriginalPlayerStats(config, player.getPlayer());
+      this.originalStats.ifillOtherStats(player.getPlayer());
+      this.imaxStats();
       if (tpAuto) {
          player.getPlayer().teleport(arena.getLobby());
       }
-
-      this.originalStats.ifillOtherStats(player.getPlayer());
-      this.imaxStats();
    }
 
    public User(int time) {

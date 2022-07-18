@@ -19,7 +19,7 @@ public class CRSignTop extends CRSignDisplay {
       Language local = Language.getDefault();
       event.setLine(0, ChatColor.translateAlternateColorCodes('&', local.get(Language.Messages.PREFIX_LONG)));
       event.setLine(1, ChatColor.translateAlternateColorCodes('&', local.get(Language.Messages.KEYWORD_SIGN_TOP)));
-      event.setLine(3, arena.getHighestPlayer());
+      //event.setLine(3, arena.getHighestPlayer());
       signs.add(this);
    }
 
@@ -63,12 +63,12 @@ public class CRSignTop extends CRSignDisplay {
    }
 
    protected void updateDisplay(Language local, Sign sign) {
-      sign.setLine(3, this.arena.getHighestPlayer());
+     // sign.setLine(3, this.arena.getHighestPlayer());
       sign.update();
    }
 
    public void onInteract(Player player) {
       Language local = CubeRunner.get().getLang(player);
-      local.sendMsg(player, local.get(Language.Messages.KEYWORD_SIGN_TOP) + ChatColor.WHITE + " : " + this.arena.getHighestPlayerScore() + " " + local.get(Language.Messages.KEYWORD_GENERAL_BY) + " " + ChatColor.DARK_AQUA + this.arena.getHighestPlayer());
+      local.sendMsg(player, local.get(Language.Messages.KEYWORD_SIGN_TOP) + ChatColor.WHITE + " : " + this.arena.getHighestPlayerScore() + " " + local.get(Language.Messages.KEYWORD_GENERAL_BY));
    }
 }

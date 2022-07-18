@@ -79,10 +79,10 @@ public class CRInventoryColor extends CRInventory {
    }
 
    public void update(ItemStack itemStack, InventoryAction action) {
-      if (itemStack.getType().name().toLowerCase().endsWith("terracotta")|| itemStack.getType().name().toLowerCase().endsWith("wool")) {
+      if (itemStack.getType().name().toLowerCase().endsWith("terracotta") || itemStack.getType().name().toLowerCase().endsWith("wool")) {
          if (this.arena.getGameState() != GameState.ACTIVE && this.arena.getGameState() != GameState.ENDING) {
             int valueOfItem = itemStack.getDurability();
-            if (itemStack.getType() == Material.LEGACY_STAINED_CLAY) {
+            if (itemStack.getType().name().toLowerCase().contains("terracotta")) {
                valueOfItem += 16;
             }
 

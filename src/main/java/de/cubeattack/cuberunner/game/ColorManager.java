@@ -1,13 +1,15 @@
 package de.cubeattack.cuberunner.game;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import de.cubeattack.cuberunner.CubeRunner;
 import de.cubeattack.cuberunner.MySQL;
 import de.cubeattack.cuberunner.utils.ItemStackManager;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.enchantments.Enchantment;
+
 
 public class ColorManager {
    private long colorIndice;
@@ -31,21 +33,66 @@ public class ColorManager {
       }
    }
 
+   private Object getRandomObject(Collection from) {
+      Random rnd = new Random();
+      int i = rnd.nextInt(from.size());
+      return from.toArray()[i];
+   }
+
    public void updateLists() {
       this.allBlocks = new ArrayList();
       this.onlyChoosenBlocks = new ArrayList();
       long tempColorIndice = this.colorIndice;
 
-      for(int i = 31; i >= 0; --i) {
-         ItemStackManager icon;
-         if (i >= 16) {
-            icon = new ItemStackManager(Material.LEGACY_STAINED_CLAY);
-         } else {
-            icon = new ItemStackManager(Material.LEGACY_WOOL);
+      Tag<Material> wool = Tag.WOOL;
+      Tag<Material> terracotta = Tag.TERRACOTTA;
+      ItemStackManager icon;
+      int i = 31;
+
+      for (Material m : terracotta.getValues()) {
+         icon = new ItemStackManager(m);
+
+         int value = (int)Math.pow(2.0D, i);
+         if ((long)value <= tempColorIndice) {
+            icon.addEnchantement(Enchantment.DURABILITY, 1);
+            tempColorIndice -= (long)value;
+            this.onlyChoosenBlocks.add(0, icon);
          }
 
+         this.allBlocks.add(0, icon);
+         i--;
+      }
+
+      for (Material m : wool.getValues()) {
+         icon = new ItemStackManager(m);
+
+         int value = (int)Math.pow(2.0D, i);
+         if ((long)value <= tempColorIndice) {
+            icon.addEnchantement(Enchantment.DURABILITY, 1);
+            tempColorIndice -= (long)value;
+            this.onlyChoosenBlocks.add(0, icon);
+         }
+
+         this.allBlocks.add(0, icon);
+         i--;
+      }
+
+      if (this.onlyChoosenBlocks.size() == 0) {
+         this.onlyChoosenBlocks = this.allBlocks;
+      }
+
+      /*for(int i = 31; i >= 0; --i) {
+         ItemStackManager icon;
+         if (i >= 16) {
+            icon = new ItemStackManager()
+           // icon = new ItemStackManager(Material.LEGACY_STAINED_CLAY);
+         } else {
+            //icon = new ItemStackManager(Material.LEGACY_WOOL);
+         }
+
+
          icon.setData((short)(i % 16));
-         int value = (int)Math.pow(2.0D, (double)i);
+         int value = (int)Math.pow(2.0D, i);
          if ((long)value <= tempColorIndice) {
             icon.addEnchantement(Enchantment.DURABILITY, 1);
             tempColorIndice -= (long)value;
@@ -58,11 +105,14 @@ public class ColorManager {
       if (this.onlyChoosenBlocks.size() == 0) {
          this.onlyChoosenBlocks = this.allBlocks;
       }
+      #
+       */
 
    }
 
+
    public ItemStackManager getRandomAvailableBlock() {
-      return (ItemStackManager)this.onlyChoosenBlocks.get((int)Math.floor(Math.random() * (double)this.onlyChoosenBlocks.size()));
+      return this.onlyChoosenBlocks.get((int)Math.floor(Math.random() * (double)this.onlyChoosenBlocks.size()));
    }
 
    public List<ItemStackManager> getAllBlocks() {

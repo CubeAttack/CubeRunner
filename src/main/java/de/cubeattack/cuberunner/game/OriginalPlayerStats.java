@@ -99,6 +99,6 @@ public class OriginalPlayerStats {
       this.foodLevel = player.getFoodLevel();
       this.saturation = player.getSaturation();
       this.effects = player.getActivePotionEffects();
-      this.inventoryItems = (ItemStack[])player.getInventory().getContents().clone();
+      this.inventoryItems = player.getInventory().getContents().clone();
    }
 }
