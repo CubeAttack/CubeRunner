@@ -95,7 +95,7 @@ public class Language {
          }
       }
 
-      return languages.get("en");
+      return languages.get("de");
    }
 
    public static HashMap<String, Language> getLanguages() {
@@ -144,10 +144,11 @@ public class Language {
       END_REWARD("endReward", "&dYou gain %amount%%currency% for surviving %amount2% seconds."),
       END_BROADCAST_MULTIPLAYER("endBroadcastMultiplayer", "&6Congradulation to &f%player% &6who won a multiplayer game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"),
       END_BROADCAST_SINGLEPLAYER("endBroadcastSingleplayer", "&f%player% &6finished a game of CubeRunner in the arena &5%arena% &6with a score of &4%score%&6!"),
+      GUI_Back("GuiBack", "&cBack"),
       SHOP_GUI_TITLE("shopGuiTitle", "&6Shop"),
-      SHOP_BLOCK_TITLE("shopBlockTitle", "&6Shop"),
-      SHOP_PETS_TITLE("shopPetsTitle", "&6Shop"),
-      SHOP_WEAPONS_TITLE("shopWeaponsTitle", "&6Shop"),
+      SHOP_BLOCK_TITLE("shopBlockTitle", "&6Shop - Block"),
+      SHOP_PETS_TITLE("shopPetsTitle", "&6Shop - Pets"),
+      SHOP_WEAPONS_TITLE("shopWeaponsTitle", "&6Shop - Weapons"),
       STATS_GUI_TITLE("statsGuiTitle", "&6Stats"),
       STATS_INFO_AVERAGE_SCORE("statsInfoAverageScore", "&bAverage Score Per Game"),
       STATS_INFO_DISTANCE_RAN("statsInfoDistanceRan", "&bTotal Distance Ran"),
