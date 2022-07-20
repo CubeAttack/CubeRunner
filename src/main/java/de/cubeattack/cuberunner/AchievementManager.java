@@ -3,8 +3,9 @@ package de.cubeattack.cuberunner;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
+import de.cubeattack.cuberunner.utils.Economy;
 import de.cubeattack.cuberunner.utils.MinecraftConfiguration;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

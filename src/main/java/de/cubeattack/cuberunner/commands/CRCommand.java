@@ -541,6 +541,25 @@ public enum CRCommand {
       }
 
       public void complete(List<String> tabCompletion, String[] args) {}
+   },
+   COINS("coins", Language.Messages.COMMAND_SETHEADS, "cuberunner.coins", "/%command% coins <player> <option>", CRCommandType.GAME) {
+      public void execute(CubeRunner plugin, Player player, String[] args, Object... extra) {
+         Language local = CubeRunner.get().getLang(player);
+         local.sendMsg(player, "Test");
+      }
+
+      public void complete(List<String> tabCompletion, String[] args) {
+         if (args.length == 2) {
+            Iterator var4 = Arena.getArenas().iterator();
+
+            while(var4.hasNext()) {
+               Arena arena = (Arena)var4.next();
+               if (arena.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                  tabCompletion.add(arena.getName());
+               }
+            }
+         }
+      }
    };
 
    private final String commandName;

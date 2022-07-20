@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class MySQL {
    private CubeRunner plugin;
@@ -92,13 +91,10 @@ public class MySQL {
       try {
          PreparedStatement st = this.connection.prepareStatement(qry);
          st.execute();
-         st.close();
       } catch (SQLException var3) {
          this.connect();
          System.err.println(qry);
-         System.err.println(var3);
       }
-
    }
 
    public void newPlayer(UUID uuid, String name) {
@@ -119,7 +115,7 @@ public class MySQL {
       ResultSet rs = null;
 
       try {
-         PreparedStatement st = this.connection.prepareStatement(qry);
+         PreparedStatement st = this.connection.prepareStatement(qry,  ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
          rs = st.executeQuery();
       } catch (SQLException var4) {
          this.connect();

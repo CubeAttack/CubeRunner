@@ -2,7 +2,6 @@ package de.cubeattack.cuberunner;
 
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 import de.cubeattack.cuberunner.game.Arena;
@@ -10,17 +9,19 @@ import de.cubeattack.cuberunner.commands.signs.CRSign;
 import de.cubeattack.cuberunner.game.Head;
 import de.cubeattack.cuberunner.game.User;
 import de.cubeattack.cuberunner.listeners.*;
-import net.milkbowl.vault.economy.Economy;
+import de.cubeattack.cuberunner.utils.Economy;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CubeRunner extends JavaPlugin {
    private static CubeRunner plugin;
+   private static int pluginid = 15831;
    public static final String name = "CubeRunner";
+   private static final String currency = "Coins";
    private Configuration config;
    private MySQL mysql = new MySQL();
    private PlayerData playerData;
@@ -34,14 +35,13 @@ public class CubeRunner extends JavaPlugin {
    }
 
    public void onEnable() {
+      new Metrics(this, pluginid);
       this.connectMySQL();
       this.loadLanguages();
+      this.initialiseEconomy();
 
-      if (!this.initialiseEconomy()) {
-         this.getServer().getPluginManager().disablePlugin(this);
-         return;
-      }
-
+      //this.economy.depositPlayer(Bukkit.getOfflinePlayer("EinfacheSache"), 100);
+      boolean b = this.economy.withdrawPlayer(Bukkit.getOfflinePlayer("EinfacheSache"), 100);
       this.playerData = new PlayerData(this);
       this.playerData.loadPlayers(plugin);
       this.achievementManager = new AchievementManager(this);
@@ -100,30 +100,14 @@ public class CubeRunner extends JavaPlugin {
    }
 
    public boolean initialiseEconomy() {
-      if (this.config.economyRewards && !this.setupEconomy()) {
-         this.getLogger().warning("Vault not found.");
-         this.getLogger().warning("Add Vault to your plugins or disable monetary rewards in the config.");
-         this.getLogger().info("Disabling CubeRunner...");
-         this.getServer().getPluginManager().disablePlugin(this);
+      if (!this.config.economyRewards){
+         this.economy = null;
          return false;
-      } else {
-         return true;
       }
-   }
 
-   private boolean setupEconomy() {
-      this.economy = null;
-      if (this.getServer().getPluginManager().getPlugin("Vault") == null) {
-         return false;
-      } else {
-         RegisteredServiceProvider<Economy> rsp = this.getServer().getServicesManager().getRegistration(Economy.class);
-         if (rsp == null) {
-            return false;
-         } else {
-            this.economy = rsp.getProvider();
-            return true;
-         }
-      }
+      this.getLogger().info("Loading Economy System ....");
+      this.economy = new Economy(currency);
+      return true;
    }
 
    public boolean isEconomyEnabled() {
